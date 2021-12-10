@@ -1,0 +1,8 @@
+{
+    "component": {
+        "testFiles": "**/*.cy.*",
+        "componentFolder": "src",
+        "integrationFolder": "src",
+        "videos": false
+    }
+}
