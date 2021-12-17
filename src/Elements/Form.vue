@@ -253,7 +253,7 @@ export default {
                 name: name,
                 label: label,
                 component: 'jet-input',
-                visible: !this.hidden.includes(name),
+                visible: this.isVisible(name),
                 props: {
                     type: 'text',
                 },
@@ -327,6 +327,9 @@ export default {
 
             })
         },
+        isVisible(name) {
+            return !this.hidden || ! this.hidden.includes(name)
+        },
         navigate(url) {
             if(this.$inertia) {
                 this.$inertia.get(url)
@@ -356,6 +359,10 @@ export default {
 
             if (!field.hasOwnProperty('span')) {
                 field.span = '12';
+            }
+
+            if (!field.hasOwnProperty('visible')) {
+                field.visible = this.isVisible(field.name);
             }
 
             if (!field.hasOwnProperty('label')) {

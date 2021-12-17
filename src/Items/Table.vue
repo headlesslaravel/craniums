@@ -94,7 +94,7 @@ export default {
             output.push({
                 path: path,
                 name: column,
-                testid: column,
+                testid: path,
                 display: display,
             });
         });
