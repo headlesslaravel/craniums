@@ -1,18 +1,17 @@
 <template>
     <div>
         <div v-if="items.length">
-            <ul :class="wrapperClass">
+            <ul :class="wrapperClass" class="py-2">
                 <li
                     v-for="(entry, index) in items"
                     :key="entry[itemKey]"
                     :class="itemClass + ' ' + cursorWhenClickable"
-                    class="relative"
+                    class="flex space-x-5 items-center"
                     @click="visit(entry)"
                 >
+                    <input type="checkbox" v-if="selected" :checked="selected && selected.includes(entry.id)" class="focus:ring-gray-9000 h-4 w-4 text-gray-900 border-gray-300 rounded">
                     <slot :index="index" :value="entry" name="item">
-                        <div class="py-2 px-6 border-t hover:bg-gray-50">
-                            {{ entry[itemDisplay] }}
-                        </div>
+                        <span :title="entry[itemDisplay]" class="truncate">{{ entry[itemDisplay] }}</span>
                     </slot>
                 </li>
             </ul>

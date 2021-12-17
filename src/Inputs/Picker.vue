@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div data-test="jet-picker">
         <div class="flex space-x-4 items-center select-none">
             <jet-input
                 :class="{ 'bg-gray-50 cursor-not-allowed': isDisabled }"
@@ -8,10 +8,10 @@
                 :value="buttonText"
                 class="w-full select-none cursor-pointer caret-transparent"
                 type="text"
-                @click="isPicking = true"
+                @click="picking = true"
             />
 
-            <div v-if="picked || (fill && !isCleared)">
+            <div v-if="picked">
                 <svg
                     class="h-6 w-6 mr-3 text-gray-500 hover:text-black cursor-pointer"
                     fill="none"
@@ -31,12 +31,24 @@
             </div>
         </div>
 
-        <jet-modal :show="isPicking" max-width="lg" @close="isPicking = false">
+        <jet-modal :show="creating" @close="creating = false">
+            <slot name="create" :success="() => { this.creating = false }" :cancel="() => { this.creating = false }" />
+        </jet-modal>
+
+        <jet-modal :show="picking && !creating" max-width="lg" @close="picking = false">
             <div :data-test="`jet-picker-modal-${name}`">
-                <jet-finder :connect="`picker-${name}`"/>
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <jet-finder :connect="`picker-${name}`"/>
+                    </div>
+                    <div v-if="$slots['create']" class="pr-5">
+                        <button @click="creating = true">New</button>
+                    </div>
+                </div>
 
                 <jet-list
                     :click="pick"
+                    item-class="hover:bg-gray-50 py-2 px-5 border-t"
                     :connect="`picker-${name}`"
                     :item-display="itemDisplay"
                     :items-path="itemsPath"
@@ -48,6 +60,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import get from 'lodash.get'
 import JetModal from '@/Jetstream/Modal.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
@@ -64,8 +78,7 @@ export default {
     },
     props: {
         url: String,
-        fill: Object,
-        remember: Boolean,
+        fill: [Object, String],
         name: {
             type: String,
             required: true,
@@ -87,19 +100,37 @@ export default {
             type: String,
             default: 'data',
         },
+        itemPath: {
+            type: String,
+        },
         chain: {
             type: [String, Number, null],
             default: 'none',
         },
     },
-    mounted() {
-        if (this.remember && this.modelValue) {
-            this.picked = JSON.parse(localStorage.getItem(this.localKey));
-        }
+    beforeMount() {
         if (this.isChained && this.chain) {
             this.isDisabled = false;
         } else if (this.isChained && !this.fill) {
             this.isDisabled = true;
+        }
+
+        if(!this.modelValue) {
+            return;
+        }
+
+        if (this.fill && typeof this.fill === 'object' && this.fill.route) {
+            let params = {}
+            Object.keys(this.fill).forEach(key => {
+                if(key !== 'route') {
+                    params[key] = this.fill[key]
+                }
+            })
+            this.setPickedFromUrl(route(this.fill.route, params))
+        } else if(this.fill && typeof this.fill !== 'object') {
+            this.setPickedFromUrl(this.fill)
+        } else {
+            this.picked = this.fill
         }
     },
     data() {
@@ -107,15 +138,13 @@ export default {
             picked: null,
             isCleared: false,
             isDisabled: false,
-            isPicking: false,
+            picking: false,
+            creating: false,
         };
     },
     computed: {
         isChained() {
             return this.$props.chain !== 'none';
-        },
-        localKey() {
-            return `${window.location.pathname}:filter:${this.name}`;
         },
         buttonText() {
             if (this.isCleared) {
@@ -126,17 +155,26 @@ export default {
                 return this.picked[this.itemDisplay];
             }
 
-            if (this.fill) {
-                return this.fill[this.itemDisplay];
-            }
-
             return this.text;
         },
     },
     methods: {
+        setPickedFromUrl(url) {
+          axios.request({
+              url: url,
+              method: 'GET',
+              headers: {'Wants-Json': true}
+          }).then((response => {
+              if(this.itemPath) {
+                this.picked = get(response.data, this.itemPath)
+              } else {
+                this.picked = response.data
+              }
+          }))
+        },
         pick(item) {
             this.picked = item;
-            this.isPicking = false;
+            this.picking = false;
             this.isCleared = false;
             this.$emit('picked', item);
             this.$emit('update:modelValue', item[this.itemKey]);

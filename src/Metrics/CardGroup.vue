@@ -19,6 +19,7 @@
 import MetricCount from './MetricCount'
 export default {
     props: ['url', 'filters'],
+    inject: ['config'],
     components: {
         MetricCount
     },

@@ -16,6 +16,20 @@ describe('Table cells', () => {
         cy.get('td').eq(1).should('have.text', 'a movie')
     })
 
+    it.only('with cells & header as a flat array', () => {
+        cy.mount(
+            <Table
+                cells={['title:Custom Title', 'description:Custom Description']}
+                data={[{title: 'Titanic', description: 'a movie'}]}
+            />
+        )
+
+        cy.get('th').eq(0).should('have.text', 'Custom Title')
+        cy.get('th').eq(1).should('have.text', 'Custom Description')
+        cy.get('td').eq(0).should('have.text', 'Titanic')
+        cy.get('td').eq(1).should('have.text', 'a movie')
+    })
+
     it('with nested cells', () => {
         cy.mount(
             <Table

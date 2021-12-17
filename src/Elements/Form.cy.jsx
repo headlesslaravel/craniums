@@ -18,6 +18,51 @@ describe('Form Setup', () => {
             .invoke('attr', 'method')
             .should('eq', 'POST')
     })
+
+    it.only('allows manual values not in fields options', () => {
+        let handler = {
+            request(request) {
+                return new Promise((resolutionFunc, rejectionFunc) => {
+                    resolutionFunc({
+                        data: {
+                            message: "Mocked handler worked",
+                            url: request.url,
+                            method: request.method,
+                            data: {
+                                title: request.data.title,
+                                author_id: request.data.author_id,
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        let onSuccessSpy = cy.spy().as('onSuccessSpy')
+
+        cy.mount(
+            <Form
+                action="/movies/new"
+                fields={['title']}
+                merge={{author_id: 1}}
+                handler={handler}
+                onSuccess={onSuccessSpy}
+            />
+        )
+
+        cy.get('input[name="title"]').type('Titanic')
+        cy.get('button[type="submit"]').click()
+
+        cy.get("@onSuccessSpy").should('have.been.calledWith', {
+            message: "Mocked handler worked",
+            url: '/movies/new',
+            method: 'post',
+            data: {
+                title: 'Titanic',
+                author_id: 1,
+            }
+        })
+    })
 })
 
 describe('Form Fields', () => {
@@ -35,6 +80,22 @@ describe('Form Fields', () => {
         cy.get('label[for="description"]').should('contain.text', 'Description')
         cy.get('input[name="title"]').should('exist').should('not.have.value')
         cy.get('input[name="description"]').should('exist').should('not.have.value')
+    })
+
+    it('with a flat array of field names with labels', () => {
+        cy.mount(<Form/>, {
+            props: {
+                action: '/users/new',
+                values: {title: 'Hello', description: 'World'},
+                fields: ['title:Custom Title', 'description:Custom Description']
+            }
+        })
+
+        cy.get('form input').should('have.length', 2)
+        cy.get('label[for="title"]').should('contain.text', 'Custom Title')
+        cy.get('label[for="description"]').should('contain.text', 'Custom Description')
+        cy.get('input[name="title"]').should('exist').should('have.value', 'Hello')
+        cy.get('input[name="description"]').should('exist').should('have.value', 'World')
     })
 
     it('with values when passed a values object', () => {
@@ -71,6 +132,25 @@ describe('Form Fields', () => {
 
         cy.get('input[name="title"]').should('have.value', 'Titanic')
         cy.get('input[name="description"]').should('not.exist')
+    })
+
+    it('with fields only from values object', () => {
+        cy.intercept('/users/new', (request) => {
+            expect(request.body).to.haveOwnProperty('title');
+            expect(request.body).not.to.haveOwnProperty('invalid');
+        })
+
+        cy.mount(<Form/>, {
+            props: {
+                action: '/users/new',
+                exclude: ['description'],
+                fields: ['title'],
+                values: {title: 'Titanic', invalid: 'this is not in fields'}
+            }
+        })
+
+        cy.get('input[name="title"]').should('have.value', 'Titanic')
+        cy.get('[type="submit"]').click()
     })
 
     it('with an object', () => {

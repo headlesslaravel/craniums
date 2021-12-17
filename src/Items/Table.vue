@@ -68,19 +68,34 @@ export default {
         let output = [];
 
         this.cells.forEach((cell) => {
+            let path = cell;
             let column = cell;
-            let display = cell;
+            let display = cell.replace('_', ' ');
 
-            if (cell.includes('.')) {
-                display = cell.split('.')[0];
+            // 'brand.title:Brand'
+            // 'title:Brand'
+            // 'brand.title'
+            // 'title'
+
+            if(cell.includes(':')) {
+                column = cell.split(':')[0]
+                display = cell.split(':')[1]
+                path = column;
+            }
+
+            if (column.includes('.')) {
                 column = cell.split('.')[1];
+
+                if(display === cell) {
+                    display = cell.split('.')[0];
+                }
             }
 
             output.push({
-                path: cell,
+                path: path,
                 name: column,
-                testid: display,
-                display: display.replace('_', ' '),
+                testid: column,
+                display: display,
             });
         });
 

@@ -1,3 +1,5 @@
+// layouts
+import SidebarLayout from "./src/Layouts/SidebarLayout";
 // items
 import JetTable from './src/Items/Table';
 import JetGrid from './src/Items/Grid';
@@ -14,6 +16,7 @@ import JetNotifications from './src/Elements/Notifications';
 import JetPagination from './src/Elements/Pagination';
 import JetDropdown from './src/Elements/Dropdown';
 import JetTimestamp from './src/Elements/Timestamp';
+import Breadcrumbs from './src/Elements/Breadcrumbs';
 import JetFlash from './src/Elements/Flash';
 import RelativeDates from './src/Elements/RelativeDates';
 // metrics
@@ -59,6 +62,7 @@ export default {
 };
 
 export {
+    SidebarLayout,
     JetTable,
     JetGrid,
     JetList,
@@ -75,6 +79,7 @@ export {
     JetNotifications,
     JetPagination,
     JetTimestamp,
+    Breadcrumbs,
     JetFlash,
     JetImageInput,
     JetFileInput,

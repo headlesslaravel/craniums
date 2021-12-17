@@ -17,69 +17,72 @@
                     :data-test="`field-${field.name}`"
                     class="py-2"
                 >
+                    <div v-if="field.visible">
+                        <div v-if="field.hasOwnProperty('divider')" class="border-b pb-5"/>
 
-                    <div v-if="field.hasOwnProperty('divider')" class="border-b pb-5"/>
+                        <slot v-else-if="field.section_title" :value="field.section_title" name="section_title">
+                            <div>
+                                <p class="flex-1 font-semibold tracking-wider text-gray-700 leading-tight pb-4 border-b">
+                                    {{ field.section_title }}
+                                </p>
+                            </div>
+                        </slot>
 
-                    <slot v-else-if="field.section_title" :value="field.section_title" name="section_title">
-                        <div>
-                            <p class="flex-1 font-semibold tracking-wider text-gray-700 leading-tight pb-4 border-b">
-                                {{ field.section_title }}
-                            </p>
-                        </div>
-                    </slot>
+                        <slot
+                            v-else
+                            :error="getError(field.name)"
+                            :errors="errors"
+                            :index="index"
+                            :name="`field.${field.name}.all`"
+                            :values="formValues"
+                        >
+                            <div>
+                                <slot :name="`label.${field.name}`">
+                                    <jet-label
+                                        :for="field.name"
+                                        :value="field.label"
+                                    />
+                                </slot>
 
-                    <slot
-                        v-else
-                        :error="getError(field.name)"
-                        :errors="errors"
-                        :index="index"
-                        :name="`field.${field.name}.all`"
-                        :values="formValues"
-                    >
-                        <div>
-                            <jet-label
-                                :for="field.name"
-                                :value="field.label"
-                            />
+                                <div class="mt-1">
+                                    <div>
+                                        <slot
+                                            :index="index"
+                                            :name="`field.${field.name}`"
+                                            :values="formValues"
+                                        >
+                                            <component
+                                                :is="field.component"
+                                                :id="field.name"
+                                                v-model="formValues[field.name]"
+                                                :class="{ disabled: processing }"
+                                                :disabled="processing"
+                                                :name="field.name"
+                                                :placeholder="field.label"
+                                                autocomplete="new-password"
+                                                class="w-full"
+                                                :data-test="`jet-input-${field.name}`"
+                                                v-bind="field.props"
+                                            />
+                                        </slot>
 
-                            <div class="mt-1">
-                                <div>
-                                    <slot
-                                        :index="index"
-                                        :name="`field.${field.name}`"
-                                        :values="formValues"
-                                    >
-                                        <component
-                                            :is="field.component"
-                                            :id="field.name"
-                                            v-model="formValues[field.name]"
-                                            :class="{ disabled: processing }"
-                                            :disabled="processing"
-                                            :name="field.name"
-                                            :placeholder="field.label"
-                                            autocomplete="new-password"
-                                            class="w-full"
-                                            :data-test="`jet-input-${field.name}`"
-                                            v-bind="field.props"
-                                        />
-                                    </slot>
-
-                                    <!-- TODO: errorsFormatted to avoid multiple formats                    -->
-                                    <!-- TODO: fields.title.error slot -->
-                                    <div v-if="errors && errors.hasOwnProperty(field.name)" :data-test="`jet-form-error-${field.name}`">
-                                        <JetInputError
-                                            v-if="Array.isArray(errors[field.name])"
-                                            :message="errors[field.name][0]"
-                                        />
-                                        <JetInputError
-                                            v-else
-                                            :message="errors[field.name]"
-                                        />
+                                        <!-- TODO: errorsFormatted to avoid multiple formats                    -->
+                                        <!-- TODO: fields.title.error slot -->
+                                        <div v-if="errors && errors.hasOwnProperty(field.name)" :data-test="`jet-form-error-${field.name}`">
+                                            <JetInputError
+                                                v-if="Array.isArray(errors[field.name])"
+                                                :message="errors[field.name][0]"
+                                            />
+                                            <JetInputError
+                                                v-else
+                                                :message="errors[field.name]"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </slot>
+                        </slot>
+                    </div>
                 </div>
             </div>
             <slot name="footer">
@@ -127,6 +130,7 @@ import JetInputError from '@/Jetstream/InputError.vue';
 import Connect from '../Mixins/Connect';
 import Config from '../Mixins/Config';
 import {str_capitalize} from "../Helpers/Str";
+import axios from 'axios';
 
 export default {
     components: {
@@ -146,6 +150,14 @@ export default {
         },
         handler: {
             type: Object
+        },
+        hidden: {
+            type: Array,
+            default: []
+        },
+        merge: {
+            type: Object,
+            default: () => {}
         },
         exclude: {
             type: Array,
@@ -209,13 +221,39 @@ export default {
                     : field.value;
             });
 
+            if(this.fields) {
+                // exclude invalid :values
+                Object.keys(values).forEach(key => {
+                    if(!this.fieldNames.includes(key)) {
+                        delete values[key]
+                    }
+                })
+            }
+
+            if(this.merge) {
+                Object.keys(this.merge).forEach(key => {
+                    values[key] = this.merge[key]
+                })
+            }
+
             this.formValues = values;
         },
         defaultFieldFormat(field) {
+
+            let name = field
+            let label = str_capitalize(field)
+
+            if(field.includes(':')) {
+                let parts = field.split(':')
+                name = parts[0]
+                label = parts[1]
+            }
+
             let output = {
-                name: field,
-                label: str_capitalize(field),
+                name: name,
+                label: label,
                 component: 'jet-input',
+                visible: !this.hidden.includes(name),
                 props: {
                     type: 'text',
                 },
@@ -271,7 +309,7 @@ export default {
                 if (this.connect) {
                     this.connectChanged('refresh');
                 } else {
-                    this.$inertia.get(response.data.url)
+                    this.navigate(response.data.url);
                 }
 
             }).catch(errors => {
@@ -279,7 +317,7 @@ export default {
                 // going to the same location will redirect to login
                 // but retain the redirect back after logging in
                 if (errors.response && errors.response.status === 401) {
-                    this.$inertia.get(window.location);
+                    this.navigate(window.location);
                 }
 
                 this.errors = errors.response.data.errors;
@@ -288,6 +326,11 @@ export default {
             }).finally(() => {
 
             })
+        },
+        navigate(url) {
+            if(this.$inertia) {
+                this.$inertia.get(url)
+            }
         },
         getError(name) {
             // todo: normalize the errors array instead
@@ -336,6 +379,9 @@ export default {
     computed: {
         hasCancelListener() {
             return this.$attrs && this.$attrs.onCancel;
+        },
+        fieldNames() {
+            return this.fieldsFormatted.map(field => field.name)
         },
         fieldsFormatted() {
             if (this.fields.length === 0) {

@@ -3,26 +3,30 @@
         <dl class="sm:divide-y sm:divide-gray-200">
             <div
                 v-for="item in valuesFormatted"
-                class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                class="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
                 <slot :name="`row.${item.key}`" :value="item.value">
-                    <dt :data-test="`jet-detail-key-${item.key}`"
-                        class="capitalize text-sm font-medium text-gray-500">
-                        <slot :name="`item.key.${item.key}`" :value="item.value">
-                            {{ item.display }}
-                        </slot>
-                    </dt>
-                    <dd :data-test="`jet-detail-value-${item.key}`"
-                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        <slot :name="`value.${item.key}`" :value="item.value">
-                            <component
-                                :is="item.component"
-                                :key="item.key"
-                                :display="item.display"
-                                :value="item.value"
-                            />
-                        </slot>
-                    </dd>
+                    <slot :name="`key.${item.key}.all`">
+                        <dt :data-test="`jet-detail-key-${item.key}`"
+                            class="capitalize text-sm font-medium text-gray-500 py-4">
+                            <slot :name="`item.key.${item.key}`" :value="item.value">
+                                {{ item.display }}
+                            </slot>
+                        </dt>
+                    </slot>
+                    <slot :name="`value.${item.key}.all`" :value="item.value">
+                        <dd :data-test="`jet-detail-value-${item.key}`"
+                            class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 py-4">
+                            <slot :name="`value.${item.key}`" :value="item.value">
+                                <component
+                                    :is="item.component"
+                                    :key="item.key"
+                                    :display="item.display"
+                                    :value="item.value"
+                                />
+                            </slot>
+                        </dd>
+                    </slot>
                 </slot>
             </div>
         </dl>

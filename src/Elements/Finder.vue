@@ -55,59 +55,33 @@
             <span
                 v-if="$slots['filters']"
                 :class="{
-          'bg-blue-100 border-2 border-blue-500': isFiltering,
-          'bg-white': !isFiltering,
-        }"
+                  'bg-gray-200 border-black border-2': isFiltering,
+                  'bg-white': !isFiltering,
+                }"
                 class="select rounded-md border border-gray-300 cursor-pointer"
                 data-test="jet-finder-filter-trigger"
                 @click="filtering = true"
             >
         Filters
       </span>
-        </div>
+    </div>
+    </div>
+    <teleport to="body">
         <div
             v-if="$slots['filters'] && filtering"
             aria-labelledby="slide-over-title"
             aria-modal="true"
-            class="fixed inset-0 overflow-hidden"
+            class="fixed inset-0 overflow-hidden z-50"
             role="dialog"
         >
             <div class="absolute inset-0 overflow-hidden">
                 <div
                     aria-hidden="true"
-                    class="absolute inset-0 transition-opacity"
+                    class="absolute w-full h-screen transition-opacity bg-black opacity-50 z-40"
                     @click="filtering = false"
                 ></div>
-                <div class="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+                <div class="z-50 fixed inset-y-0 right-0 pl-10 max-w-full flex">
                     <div class="relative w-screen max-w-md">
-                        <div
-                            class="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4"
-                        >
-                            <button
-                                class="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                                type="button"
-                                @click="filtering = false"
-                            >
-                                <span class="sr-only">Close panel</span>
-                                <!-- Heroicon name: outline/x -->
-                                <svg
-                                    aria-hidden="true"
-                                    class="h-6 w-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M6 18L18 6M6 6l12 12"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-
                         <div
                             class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll"
                         >
@@ -148,7 +122,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </teleport>
 </template>
 <style>
 .select {
@@ -262,6 +236,7 @@ export default {
             this.applyHandler('filter', 'onFilter', filters)
         },
         applyHandler(emit, listener, payload) {
+            this.filtering = false;
             if (this.$attrs[listener]) {
                 this.$emit(emit, payload)
             } else if (this.connect) {

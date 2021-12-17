@@ -1,5 +1,6 @@
 import Connect from './Connect';
 import get from 'lodash.get';
+import axios from 'axios';
 
 export default {
     mixins: [Connect],
@@ -7,6 +8,7 @@ export default {
         url: String,
         cells: Array,
         data: Object,
+        selected: Array,
         click: [String, Function],
         wrapperClass: String,
         itemClass: String,
@@ -20,7 +22,7 @@ export default {
         itemKey: {
             type: String,
             default: 'id',
-        },
+        }
     },
     watch: {
         data: {
