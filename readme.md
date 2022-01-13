@@ -18,3 +18,9 @@ createApp({
     .use(Cranium) <---
     .mount(el);
 ```
+
+add the following to your tailwind config `content` array:
+
+```
+'./node_modules/@craniums/vue/src/**/*.vue',
+```
