@@ -9,6 +9,7 @@
                 :is="card.component"
                 :title="card.title"
                 :value="card.value"
+                :card="card"
                 v-bind="card.props"
             />
         </div>
@@ -17,11 +18,13 @@
 
 <script>
 import MetricCount from './MetricCount'
+import CardTable from './CardTable'
 export default {
     props: ['url', 'filters'],
     inject: ['config'],
     components: {
-        MetricCount
+        MetricCount,
+        CardTable,
     },
     data() {
         return {

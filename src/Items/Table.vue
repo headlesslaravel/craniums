@@ -1,7 +1,7 @@
 <template>
-    <div class="overflow-auto" :data-test="test">
+    <div class="overflow-auto" :data-test="test" v-if="loaded">
         <div v-if="items.length > 0">
-            <table cellpadding="0" cellspacing="0" class="whitespace-nowrap w-full">
+            <table class="whitespace-nowrap w-full">
                 <thead>
                 <tr class="text-left font-bold border-b">
                     <th v-for="th in cellsFormatted" class="px-5 py-3">
@@ -36,7 +36,7 @@
                         </slot>
                     </td>
                     <td v-if="$slots['td-last']">
-                        <div class="flex justify-end">
+                        <div class="flex justify-center">
                             <slot :row="item" name="td-last"/>
                         </div>
                     </td>
@@ -55,6 +55,7 @@
 
 <script>
 import Items from '../Mixins/Items';
+import { str_capitalize } from '../Helpers/Str';
 
 export default {
     mixins: [Items],
@@ -65,17 +66,21 @@ export default {
         };
     },
     beforeMount() {
-        let output = [];
-
-        this.cells.forEach((cell) => {
-            let path = cell;
-            let column = cell;
-            let display = cell.replace('_', ' ');
-
+        this.cellsFormatted = this.cells.map(cell => {
+            return this.formatCell(cell);
+        });
+    },
+    methods: {
+        formatCell(cell) {
+            // supports:
             // 'brand.title:Brand'
             // 'title:Brand'
             // 'brand.title'
             // 'title'
+
+            let path = cell;
+            let column = cell;
+            let display;
 
             if(cell.includes(':')) {
                 column = cell.split(':')[0]
@@ -85,23 +90,22 @@ export default {
 
             if (column.includes('.')) {
                 column = cell.split('.')[1];
-
-                if(display === cell) {
+                if(!display) {
                     display = cell.split('.')[0];
                 }
             }
 
-            output.push({
-                path: path,
-                name: column,
-                testid: path,
-                display: display,
-            });
-        });
+            if(!display) {
+                display = cell.replace('_', ' ');
+            }
 
-        this.cellsFormatted = output;
-    },
-    methods: {
+            return {
+                path: path,
+                name: path,
+                testid: path,
+                display: str_capitalize(display),
+            }
+        },
         data_get(obj, key) {
             let target = obj;
 
@@ -114,7 +118,7 @@ export default {
             }
 
             key.split('.').forEach((segment) => {
-                if (target.hasOwnProperty(segment)) {
+                if (target && target.hasOwnProperty(segment)) {
                     target = target[segment];
                 }
             });

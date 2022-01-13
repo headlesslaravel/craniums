@@ -389,4 +389,7 @@ describe('Form Submit', () => {
         //     cy.get('div[data-test="error"]').first().should('have.text', 'The title field is required.')
         // })
     })
+
+    it('can redirect to a string url on success')
+    it('can redirect to a url returned from a function on success')
 })

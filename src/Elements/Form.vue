@@ -15,9 +15,8 @@
                     :key="field.name"
                     :class="`col-span-${field.span}`"
                     :data-test="`field-${field.name}`"
-                    class="py-2"
                 >
-                    <div v-if="field.visible">
+                    <div v-if="visibility(field.visible)">
                         <div v-if="field.hasOwnProperty('divider')" class="border-b pb-5"/>
 
                         <slot v-else-if="field.section_title" :value="field.section_title" name="section_title">
@@ -36,7 +35,7 @@
                             :name="`field.${field.name}.all`"
                             :values="formValues"
                         >
-                            <div>
+                            <div class="py-2">
                                 <slot :name="`label.${field.name}`">
                                     <jet-label
                                         :for="field.name"
@@ -50,6 +49,7 @@
                                             :index="index"
                                             :name="`field.${field.name}`"
                                             :values="formValues"
+                                            :errors="errors"
                                         >
                                             <component
                                                 :is="field.component"
@@ -62,6 +62,7 @@
                                                 autocomplete="new-password"
                                                 class="w-full"
                                                 :data-test="`jet-input-${field.name}`"
+                                                :autofocus="field.name === autofocus"
                                                 v-bind="field.props"
                                             />
                                         </slot>
@@ -144,6 +145,8 @@ export default {
     props: {
         action: String,
         method: String,
+        redirect: [String, Function],
+        autofocus: String,
         autocomplete: {
             type: String,
             default: 'new-password',
@@ -182,6 +185,7 @@ export default {
             },
         },
         values: Object,
+        wantsJson: Boolean,
     },
     data() {
         return {
@@ -238,6 +242,13 @@ export default {
 
             this.formValues = values;
         },
+        visibility(visible) {
+            if(typeof visible === 'function') {
+                return visible(this.formValues)
+            }
+
+            return visible;
+        },
         defaultFieldFormat(field) {
 
             let name = field
@@ -288,9 +299,17 @@ export default {
         makeRequest() {
             let handler = (this.handler) ? this.handler : axios
 
-            let headers = {
-                'Show-Redirect-Url': true
-            };
+            let headers = {};
+
+            if(!this.redirect) {
+                // TODO: write test
+                // if you set a redirect handler, you want the response.data to include the model
+                // so you can use it's id in a custom redirect scenario
+                // otherwise you want a standard url redirecting to the details page.
+                headers['Show-Redirect-Url'] = true
+            } else {
+                headers['Wants-Json'] = true
+            }
 
             if(this.connect) {
                 headers['Wants-Json'] = true
@@ -307,11 +326,14 @@ export default {
                 this.$emit('success', response.data);
 
                 if (this.connect) {
-                    this.connectChanged('refresh');
+                    this.connectChanged('formSuccess', response.data);
+                } else if(this.redirect && typeof this.redirect === 'function') {
+                    this.navigate(this.redirect(response.data))
+                } else if(this.redirect && typeof this.redirect === 'string') {
+                    this.navigate(this.redirect);
                 } else {
                     this.navigate(response.data.url);
                 }
-
             }).catch(errors => {
                 // 401 means user is not logged in / should be redirected
                 // going to the same location will redirect to login
@@ -320,11 +342,13 @@ export default {
                     this.navigate(window.location);
                 }
 
-                this.errors = errors.response.data.errors;
+                if(errors.response && errors.response.data) {
+                    this.errors = errors.response.data.errors;
 
-                this.$emit('errors', errors.response.data.errors)
-            }).finally(() => {
-
+                    this.$emit('errors', errors.response.data.errors)
+                } else {
+                    console.log(errors.response)
+                }
             })
         },
         isVisible(name) {

@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div v-if="loaded" data-test="list">
         <div v-if="items.length">
             <ul :class="wrapperClass" class="py-2">
                 <li
                     v-for="(entry, index) in items"
                     :key="entry[itemKey]"
-                    :class="itemClass + ' ' + cursorWhenClickable"
+                    :class="itemClass"
                     class="flex space-x-5 items-center"
                     @click="visit(entry)"
                 >

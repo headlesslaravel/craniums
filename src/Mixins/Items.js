@@ -11,7 +11,14 @@ export default {
         selected: Array,
         click: [String, Function],
         wrapperClass: String,
-        itemClass: String,
+        itemClass: {
+            type: String,
+            default: (props) => {
+                if(props.click) {
+                    return 'cursor-pointer'
+                }
+            }
+        },
         itemsPath: {
             default: 'data',
         },
@@ -22,62 +29,31 @@ export default {
         itemKey: {
             type: String,
             default: 'id',
-        }
-    },
-    watch: {
-        data: {
-            deep: true,
-            immediate: true,
-            handler(data) {
-                data = !data ? [] : data;
-                this.setItems(data);
-                this.setLinks(data);
-            },
         },
+        refreshOnChange: {
+            type: [String, Number, Boolean] // TODO: debounce 1000 so you can toggle on off quickly
+        }
     },
     created() {
         if (!this.url) return;
 
         this.currentUrl = this.url;
 
-        this.onConnectChange('updateUrl', (url) => {
-            this.currentUrl = url;
-            this.get(url);
-        });
-
-        this.onConnectChange('refresh', () => {
-            this.get(this.currentUrl);
-        });
-
-        this.onConnectChange('updateQuery', (payload) => {
-            let existing = new URL(this.url);
-            let override = Object.fromEntries(existing.searchParams.entries());
-            payload = Object.assign(payload, override);
-            let queryString = new URLSearchParams(payload).toString();
-            this.currentUrl = existing.pathname + '?' + queryString;
-            this.get(this.currentUrl);
-        });
+        this.registerConnectListeners();
     },
     mounted() {
         if (this.url) {
             this.get(this.url);
+        } else {
+            this.loaded = true
         }
     },
     data() {
         return {
             items: [],
             links: [],
+            loaded: false,
         };
-    },
-    computed: {
-        ajax() {
-            return this.url != null;
-        },
-        cursorWhenClickable() {
-            if (this.click) {
-                return ' cursor-pointer';
-            }
-        },
     },
     methods: {
         visit(entry) {
@@ -88,36 +64,97 @@ export default {
                 return this.$inertia.visit(route(this.click, entry[this.itemKey]));
             }
 
-            this.click(entry);
+            let url = this.click(entry);
+
+            if(url) {
+                this.$inertia.visit(url);
+            }
         },
         get(url) {
+            this.$emit('receiving', url)
+
             axios
                 .get(url, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Wants-Json': true,
                     },
-                })
-                .then((response) => {
-                    this.setItems(response.data);
-                    this.setLinks(response.data);
+                }).then((response) => {
+                    let items = this.getItems(response.data)
+                    let links = this.getLinks(response.data)
+
+                    this.$emit('received', items)
+
+                    this.items = items;
+                    this.links = links;
+
+                    if(!this.loaded) {
+                        this.$emit('loaded', items)
+                        this.loaded = true;
+                    }
                 });
         },
 
-        setItems(data) {
-            this.items = get(data, this.itemsPath, data);
+        getItems(data) {
+            return get(data, this.itemsPath, data);
         },
-        setLinks(data) {
+        getLinks(data) {
             if (!data) {
-                this.links = [];
-                return false;
+                return [];
             } else if (data.meta && data.meta.links) {
-                this.links = data.meta.links;
+                return data.meta.links;
             } else if (data.links) {
-                this.links = data.links;
+                return data.links;
             } else {
-                this.links = [];
+                return [];
             }
+        },
+        registerConnectListeners()
+        {
+            this.onConnectChange('updateUrl', (url) => {
+                this.currentUrl = url;
+                this.get(url);
+            });
+
+            this.onConnectChange('formSuccess', (data) => {
+                this.get(this.currentUrl);
+            });
+
+            this.onConnectChange('refresh', (data) => {
+                this.get(this.currentUrl);
+            });
+
+            this.onConnectChange('updateQuery', (payload) => {
+                let existing = new URL(this.url);
+                let override = Object.fromEntries(existing.searchParams.entries());
+                payload = Object.assign(payload, override);
+                let queryString = new URLSearchParams(payload).toString();
+                this.currentUrl = existing.pathname + '?' + queryString;
+                this.get(this.currentUrl);
+            });
+        }
+    },
+    watch: {
+        url(url) {
+            if(url) {
+                this.get(url)
+            }
+        },
+        refreshOnChange(value) {
+            if(!this.url) {
+                return;
+            }
+
+            this.get(this.url)
+        },
+        data: {
+            deep: true,
+            immediate: true,
+            handler(data) {
+                data = !data ? [] : data;
+                this.items = this.getItems(data);
+                this.links = this.getLinks(data);
+            },
         },
     },
 };

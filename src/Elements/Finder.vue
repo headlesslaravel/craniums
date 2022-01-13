@@ -65,54 +65,54 @@
         Filters
       </span>
     </div>
-    </div>
-    <teleport to="body">
-        <div
-            v-if="$slots['filters'] && filtering"
-            aria-labelledby="slide-over-title"
-            aria-modal="true"
-            class="fixed inset-0 overflow-hidden z-50"
-            role="dialog"
-        >
-            <div class="absolute inset-0 overflow-hidden">
-                <div
-                    aria-hidden="true"
-                    class="absolute w-full h-screen transition-opacity bg-black opacity-50 z-40"
-                    @click="filtering = false"
-                ></div>
-                <div class="z-50 fixed inset-y-0 right-0 pl-10 max-w-full flex">
-                    <div class="relative w-screen max-w-md">
-                        <div
-                            class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll"
-                        >
-                            <div class="px-4 sm:px-6 pb-6 border-b">
-                                <h2
-                                    id="slide-over-title"
-                                    class="text-lg font-medium text-gray-900"
-                                >
-                                    Filters
-                                </h2>
-                            </div>
-                            <div class="mt-6 relative flex-1 px-4 sm:px-6">
-                                <div class="absolute inset-0 px-4 sm:px-6">
-                                    <div
-                                        aria-hidden="true"
-                                        class="h-full flex justify-between flex-col"
+        <teleport to="body">
+            <div
+                v-if="$slots['filters'] && filtering"
+                aria-labelledby="slide-over-title"
+                aria-modal="true"
+                class="fixed inset-0 overflow-hidden z-50"
+                role="dialog"
+            >
+                <div class="absolute inset-0 overflow-hidden">
+                    <div
+                        aria-hidden="true"
+                        class="absolute w-full h-screen transition-opacity bg-black opacity-50 z-40"
+                        @click="filtering = false"
+                    ></div>
+                    <div class="z-50 fixed inset-y-0 right-0 pl-10 max-w-full flex">
+                        <div class="relative w-screen max-w-md">
+                            <div
+                                class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll"
+                            >
+                                <div class="px-4 sm:px-6 pb-6 border-b">
+                                    <h2
+                                        id="slide-over-title"
+                                        class="text-lg font-medium text-gray-900"
                                     >
-                                        <div data-test="jet-finder-filters" class="flex-1 overflow-auto">
-                                            <slot :filters="filterValues" name="filters"/>
-                                        </div>
-                                        <div class="flex space-x-4 pb-8 pt-4 border-t mt-4">
-                                            <jet-button
-                                                @click="filterHandler"
-                                                data-test="jet-finder-filters-submit">
-                                                Filter
-                                            </jet-button>
-                                            <jet-secondary-button
-                                                @click="clearFilters"
-                                                data-test="jet-finder-filters-clear">
-                                                Clear
-                                            </jet-secondary-button>
+                                        Filters
+                                    </h2>
+                                </div>
+                                <div class="mt-6 relative flex-1 px-4 sm:px-6">
+                                    <div class="absolute inset-0 px-4 sm:px-6">
+                                        <div
+                                            aria-hidden="true"
+                                            class="h-full flex justify-between flex-col"
+                                        >
+                                            <div data-test="jet-finder-filters" class="flex-1 overflow-auto">
+                                                <slot :filters="filterValues" name="filters"/>
+                                            </div>
+                                            <div class="flex space-x-4 pb-8 pt-4 border-t mt-4">
+                                                <jet-button
+                                                    @click="filterHandler"
+                                                    data-test="jet-finder-filters-submit">
+                                                    Filter
+                                                </jet-button>
+                                                <jet-secondary-button
+                                                    @click="clearFilters"
+                                                    data-test="jet-finder-filters-clear">
+                                                    Clear
+                                                </jet-secondary-button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -121,8 +121,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </teleport>
+        </teleport>
+    </div>
 </template>
 <style>
 .select {
@@ -161,6 +161,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        filtersFill: {
+            type: Object,
+            default: {},
+        },
     },
     mixins: [Connect],
     components: {
@@ -190,7 +194,13 @@ export default {
         initFilters() {
             this.filters.forEach((filter) => {
                 this.filterValues[filter] = null;
-            });
+            })
+
+            if(this.filtersFill) {
+                Object.keys(this.filtersFill).forEach(key => {
+                    this.filterValues[key] = this.filtersFill[key]
+                })
+            }
 
             let search = window.location.search;
 
@@ -230,7 +240,7 @@ export default {
             let filters = JSON.parse(JSON.stringify(this.filterValues));
 
             Object.keys(filters).forEach(
-                (k) => filters[k] == null && delete filters[k]
+                (key) => filters[key] == null && delete filters[key]
             );
 
             this.applyHandler('filter', 'onFilter', filters)
@@ -258,8 +268,10 @@ export default {
     computed: {
         isFiltering() {
             return (
-                Object.keys(this.filterValues).filter((key) => this.filterValues[key])
-                    .length > 0
+                Object.keys(this.filterValues).filter((key) => {
+                    return this.filterValues[key] !== null
+                        && this.filtersFill.hasOwnProperty(key) === false;
+                }).length > 0
             );
         },
         trashOptions() {
@@ -287,16 +299,23 @@ export default {
                 if (item instanceof Object) {
                     options.push(item);
                 } else {
+                    let display = item;
+
+                    if(item.includes(':')) {
+                        item = item.split(':')[0]
+                        display = display.split(':')[1]
+                    }
+
                     options.push({
                         name: 'sort',
                         value: item,
-                        display: this.displayFormat(item) + ' (asc)',
+                        display: this.displayFormat(display) + ' (asc)',
                     });
 
                     options.push({
                         name: 'sort-desc',
                         value: item,
-                        display: this.displayFormat(item) + ' (desc)',
+                        display: this.displayFormat(display) + ' (desc)',
                     });
                 }
             });

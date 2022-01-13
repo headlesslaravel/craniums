@@ -1,9 +1,9 @@
 <template>
-    <div data-test="jet-picker">
+    <div data-test="picker" class="relative">
         <div class="flex space-x-4 items-center select-none">
             <jet-input
                 :class="{ 'bg-gray-50 cursor-not-allowed': isDisabled }"
-                :data-test="`jet-picker-${name}`"
+                :data-test="`picker-${name}`"
                 :disabled="isDisabled"
                 :value="buttonText"
                 class="w-full select-none cursor-pointer caret-transparent"
@@ -11,14 +11,14 @@
                 @click="picking = true"
             />
 
-            <div v-if="picked">
+            <div v-if="picked" class="absolute h-full border-l flex-1 right-0 flex items-center justify-content text-center px-2 border-l">
                 <svg
-                    class="h-6 w-6 mr-3 text-gray-500 hover:text-black cursor-pointer"
+                    class="h-6 w-6 text-gray-400 hover:text-gray-600 transition-all cursor-pointer"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
-                    :data-test="`jet-picker-clear-${name}`"
+                    :data-test="`picker-clear-${name}`"
                     @click="clear"
                 >
                     <path
@@ -32,11 +32,11 @@
         </div>
 
         <jet-modal :show="creating" @close="creating = false">
-            <slot name="create" :success="() => { this.creating = false }" :cancel="() => { this.creating = false }" />
+            <slot name="create" :close="() => { this.creating = false }" />
         </jet-modal>
 
         <jet-modal :show="picking && !creating" max-width="lg" @close="picking = false">
-            <div :data-test="`jet-picker-modal-${name}`">
+            <div :data-test="`picker-modal-${name}`">
                 <div class="flex items-center">
                     <div class="flex-1">
                         <jet-finder :connect="`picker-${name}`"/>
@@ -48,7 +48,8 @@
 
                 <jet-list
                     :click="pick"
-                    item-class="hover:bg-gray-50 py-2 px-5 border-t"
+                    item-class="cursor-pointer hover:bg-gray-50 py-2 px-5 border-t"
+                    @responded="setCreatingWhenEmpty"
                     :connect="`picker-${name}`"
                     :item-display="itemDisplay"
                     :items-path="itemsPath"
@@ -67,9 +68,13 @@ import JetInput from '@/Jetstream/Input.vue';
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
 import JetFinder from '../Elements/Finder.vue'
 import JetList from '../Items/List.vue'
+import Connect from "../Mixins/Connect";
+import Empty from "../Items/Empty";
 
 export default {
+    mixins: [Connect],
     components: {
+        Empty,
         JetModal,
         JetInput,
         JetSecondaryButton,
@@ -87,7 +92,7 @@ export default {
             type: String,
             default: 'Select',
         },
-        modelValue: String,
+        modelValue: [String, Number, Object],
         itemKey: {
             type: String,
             default: 'id',
@@ -103,54 +108,37 @@ export default {
         itemPath: {
             type: String,
         },
-        chain: {
-            type: [String, Number, null],
-            default: 'none',
+        parent: {
+            type: [String, Number]
         },
     },
     beforeMount() {
-        if (this.isChained && this.chain) {
-            this.isDisabled = false;
-        } else if (this.isChained && !this.fill) {
-            this.isDisabled = true;
+        if(this.$attrs.hasOwnProperty('onUpdate:parent')) {
+            this.dependent = true;
         }
 
-        if(!this.modelValue) {
-            return;
-        }
+        this.onConnectChange('formSuccess', (data) => {
+            this.$emit('picked', data[this.itemPath])
+            this.picked = data[this.itemPath];
+            this.creating = false;
+            this.picking = false;
+        })
 
-        if (this.fill && typeof this.fill === 'object' && this.fill.route) {
-            let params = {}
-            Object.keys(this.fill).forEach(key => {
-                if(key !== 'route') {
-                    params[key] = this.fill[key]
-                }
-            })
-            this.setPickedFromUrl(route(this.fill.route, params))
-        } else if(this.fill && typeof this.fill !== 'object') {
-            this.setPickedFromUrl(this.fill)
-        } else {
-            this.picked = this.fill
-        }
+        this.setPicked()
     },
     data() {
         return {
             picked: null,
-            isCleared: false,
-            isDisabled: false,
             picking: false,
             creating: false,
+            dependent: false,
         };
     },
     computed: {
-        isChained() {
-            return this.$props.chain !== 'none';
+        isDisabled() {
+            return this.dependent && !this.parent
         },
         buttonText() {
-            if (this.isCleared) {
-                return this.text;
-            }
-
             if (this.picked) {
                 return this.picked[this.itemDisplay];
             }
@@ -159,6 +147,26 @@ export default {
         },
     },
     methods: {
+        setPicked() {
+            if(!this.modelValue) {
+                return;
+            }
+            if (this.fill && typeof this.fill === 'object' && this.fill.route) {
+                let params = {}
+                Object.keys(this.fill).forEach(key => {
+                    if(key !== 'route') {
+                        params[key] = this.fill[key]
+                    }
+                })
+
+                this.setPickedFromUrl(route(this.fill.route, params))
+
+            } else if(this.fill && typeof this.fill !== 'object') {
+                this.setPickedFromUrl(this.fill)
+            } else {
+                this.picked = this.fill
+            }
+        },
         setPickedFromUrl(url) {
           axios.request({
               url: url,
@@ -175,28 +183,26 @@ export default {
         pick(item) {
             this.picked = item;
             this.picking = false;
-            this.isCleared = false;
             this.$emit('picked', item);
             this.$emit('update:modelValue', item[this.itemKey]);
-            if (this.remember) {
-                let payload = {};
-                payload[this.itemKey] = item[this.itemKey];
-                payload[this.itemDisplay] = item[this.itemDisplay];
-                localStorage.setItem(this.localKey, JSON.stringify(payload));
-            }
         },
         clear() {
             this.picked = null;
-            this.isCleared = true;
             this.$emit('cleared');
             this.$emit('update:modelValue', null);
         },
+        setCreatingWhenEmpty(data)
+        {
+            if(this.$slots['create'] && data.length === 0) {
+                this.creating = true;
+                this.picking = false;
+            }
+        }
     },
     watch: {
-        chain(chain) {
-            this.clear();
-            this.isDisabled = chain === null;
-        },
-    },
+        parent() {
+            this.clear()
+        }
+    }
 };
 </script>

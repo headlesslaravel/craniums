@@ -23,6 +23,20 @@ describe('Finder Setup', () => {
         cy.get('@onSortSpy').should('have.been.calledOnceWithExactly', {"sort-desc": "title"})
     })
 
+    it('can alias sort label', () => {
+        const onSortSpy = cy.spy().as('onSortSpy')
+        cy.mount(<Finder onSort={onSortSpy} sort={['title:The Title']}/>)
+        cy.get('select[name="sort"]').select('The Title (asc)')
+        cy.get('@onSortSpy').should('have.been.calledOnceWithExactly', {"sort": "title"})
+    })
+
+    it('can alias sort label descending', () => {
+        const onSortSpy = cy.spy().as('onSortSpy')
+        cy.mount(<Finder onSort={onSortSpy} sort={['title:The Title']}/>)
+        cy.get('select[name="sort"]').select('The Title (desc)')
+        cy.get('@onSortSpy').should('have.been.calledOnceWithExactly', {"sort-desc": "title"})
+    })
+
     it('can view with trashed', () => {
         const onTrashSpy = cy.spy().as('onTrashSpy')
         cy.mount(<Finder onTrash={onTrashSpy} trashed={true}/>)

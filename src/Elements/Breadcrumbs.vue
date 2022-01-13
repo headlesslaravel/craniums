@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="flex" data-test="breadcrumbs">
         <div v-for="(crumb, index) in crumbs"  class="flex items-center mr-1">
             <a
                 data-test="crumb"
