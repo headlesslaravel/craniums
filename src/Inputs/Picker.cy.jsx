@@ -26,7 +26,7 @@ describe('Picker', () => {
             modelValue={1}
         />)
 
-        cy.get('[data-test="jet-picker-user_id"]').should('have.value', 'Charles')
+        cy.get('[data-test="picker-user_id"]').should('have.value', 'Charles')
     })
 
     it('can be filled via ajax endpoint', () => {
@@ -40,7 +40,7 @@ describe('Picker', () => {
             modelValue={1}
         />)
 
-        cy.get('[data-test="jet-picker-user_id"]').should('have.value', 'Charles')
+        cy.get('[data-test="picker-user_id"]').should('have.value', 'Charles')
     })
 
     it('can be filled via a object that provides the ajax endpoint', () => {
@@ -58,6 +58,6 @@ describe('Picker', () => {
             modelValue={1}
         />)
 
-        cy.get('[data-test="jet-picker-user_id"]').should('have.value', 'Charles')
+        cy.get('[data-test="picker-user_id"]').should('have.value', 'Charles')
     })
 })
