@@ -15,7 +15,7 @@
             <div v-for="result in results">
                 <div v-if="result.data.length">
                     <span class="font-bold py-2 block capitalize border-b mb-2">
-                        {{ result.meta.group }}
+                        {{ result.meta.resource }}
                     </span>
                     <ul class="pl-5">
                         <li v-for="item in result.data" class="py-1 hover:text-black transition-all">
