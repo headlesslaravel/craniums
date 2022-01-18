@@ -241,7 +241,9 @@
                                                 </span>
                                             </h2>
                                             <div class="-my-5">
-                                                <slot name="header.aside" />
+                                                <div class="flex items-center space-x-5">
+                                                    <slot name="header.aside" />
+                                                </div>
                                             </div>
                                         </div>
                                     </slot>
