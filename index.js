@@ -6,6 +6,7 @@ import JetGrid from './src/Items/Grid';
 import JetList from './src/Items/List';
 import JetEmpty from './src/Items/Empty';
 // elements
+import Importer from './src/Elements/Importer';
 import Seeker from './src/Elements/Seeker';
 import JetForm from './src/Elements/Form';
 import JetDetail from './src/Elements/Detail';
@@ -68,6 +69,7 @@ export {
     JetGrid,
     JetList,
     Seeker,
+    Importer,
     JetForm,
     JetDetail,
     JetFinder,

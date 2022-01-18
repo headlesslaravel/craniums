@@ -299,10 +299,9 @@ export default {
         makeRequest() {
             let handler = (this.handler) ? this.handler : axios
 
-            let headers = {};
+            let headers = {'Content-Type': 'multipart/form-data'};
 
             if(!this.redirect) {
-                // TODO: write test
                 // if you set a redirect handler, you want the response.data to include the model
                 // so you can use it's id in a custom redirect scenario
                 // otherwise you want a standard url redirecting to the details page.
@@ -315,9 +314,15 @@ export default {
                 headers['Wants-Json'] = true
             }
 
+            let formData = new FormData;
+
+            this.fieldsFormatted.forEach(field => {
+                formData.append(field.name, this.formValues[field.name])
+            })
+
             handler.request({
                 url: this.action,
-                data: this.deproxy(this.formValues),
+                data: formData,
                 method: this.formMethod.toLowerCase(),
                 headers: headers
             }).then((response) => {
@@ -331,7 +336,7 @@ export default {
                     this.navigate(this.redirect(response.data))
                 } else if(this.redirect && typeof this.redirect === 'string') {
                     this.navigate(this.redirect);
-                } else {
+                } else if(response.data.url) {
                     this.navigate(response.data.url);
                 }
             }).catch(errors => {
@@ -347,7 +352,7 @@ export default {
 
                     this.$emit('errors', errors.response.data.errors)
                 } else {
-                    console.log(errors.response)
+                    console.log(errors)
                 }
             })
         },
