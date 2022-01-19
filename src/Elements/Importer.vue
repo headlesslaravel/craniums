@@ -1,7 +1,7 @@
 <template>
     <div>
         <button @click="open = true">Import</button>
-        <modal :show="open" @close="open = false">
+        <modal :show="open" @close="close">
             <div v-if="success" class="p-10 text-center">
                 <div class="flex items-center text-center justify-center text-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-8" viewBox="0 0 20 20" fill="currentColor">
@@ -12,7 +12,7 @@
                 <p>A confirmation email will be sent when finished.</p>
                 <p>The email will indicate any import errors.</p>
                 <div class="text-center mt-5">
-                    <button @click="open = false" class="border px-5 py-2 rounded">Close</button>
+                    <button @click="close" class="border px-5 py-2 rounded">Close</button>
                 </div>
             </div>
             <div v-else>
@@ -53,6 +53,12 @@ export default {
         return {
             open: false,
             success: false,
+        }
+    },
+    methods: {
+        close() {
+            this.open = false;
+            this.success = false;
         }
     }
 }
