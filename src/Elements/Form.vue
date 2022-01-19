@@ -123,11 +123,11 @@
 </template>
 
 <script>
-import JetButton from '@/Jetstream/Button.vue';
-import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
-import JetLabel from '@/Jetstream/Label.vue';
-import JetInput from '@/Jetstream/Input.vue';
-import JetInputError from '@/Jetstream/InputError.vue';
+import JetButton from '../../Jetstream/Button.vue';
+import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
+import JetLabel from '../../Jetstream/Label.vue';
+import JetInput from '../../Jetstream/Input.vue';
+import JetInputError from '../../Jetstream/InputError.vue';
 import Connect from '../Mixins/Connect';
 import Config from '../Mixins/Config';
 import {str_capitalize} from "../Helpers/Str";

@@ -34,7 +34,7 @@
     </jet-dropdown>
 </template>
 <script>
-import JetDropdown from '@/Jetstream/Dropdown.vue'
+import JetDropdown from '../../Jetstream/Dropdown.vue'
 
 export default {
     components: {

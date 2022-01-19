@@ -63,9 +63,9 @@
 <script>
 import axios from 'axios'
 import get from 'lodash.get'
-import JetModal from '@/Jetstream/Modal.vue';
-import JetInput from '@/Jetstream/Input.vue';
-import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import JetModal from '../../Jetstream/Modal.vue';
+import JetInput from '../../Jetstream/Input.vue';
+import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 import JetFinder from '../Elements/Finder.vue'
 import JetList from '../Items/List.vue'
 import Connect from "../Mixins/Connect";

@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 import {Inertia} from '@inertiajs/inertia';
 
 export default {

@@ -145,12 +145,12 @@
 </style>
 <script>
 import debounce from 'lodash.debounce'
-import JetInput from '@/Jetstream/Input.vue';
+import JetInput from '../../Jetstream/Input.vue';
 import JetSelect from '../Inputs/Select.vue';
 import Connect from '../Mixins/Connect';
 import {Inertia} from '@inertiajs/inertia';
-import JetButton from '@/Jetstream/Button.vue';
-import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import JetButton from '../../Jetstream/Button.vue';
+import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 
 
 export default {
