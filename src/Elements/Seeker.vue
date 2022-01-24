@@ -53,7 +53,7 @@ export default {
                 return;
             }
 
-            axios.get('/'+this.url.trim('/')+'?term='+this.term).then(response => {
+            axios.get(this.url.trim('/')+'?term='+this.term).then(response => {
                 this.results = response.data.data;
             })
         }

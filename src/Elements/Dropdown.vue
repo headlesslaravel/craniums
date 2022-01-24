@@ -1,8 +1,8 @@
 <template>
     <div v-click-outside="close" class="relative" data-test="jet-dropdown">
-        <div ref="trigger" data-test="jet-dropdown-trigger" @click="toggle">
+        <button ref="trigger" data-test="jet-dropdown-trigger" @click="toggle" class="cursor-pointer">
             <slot name="trigger"></slot>
-        </div>
+        </button>
 
         <teleport to="body">
             <div v-show="open" class="absolute top-0 left-0" data-test="jet-dropdown-content">

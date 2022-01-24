@@ -43,31 +43,34 @@
                 name="trash"
             />
 
-            <jet-select
-                v-if="sort"
-                v-query:[connect]="sortHandler"
-                data-test="jet-finder-sort"
-                :options="sortOptions"
-                empty="Sort"
-                name="sort"
-            />
+<!--            <jet-select-->
+<!--                v-if="sort"-->
+<!--                v-query:[connect]="sortHandler"-->
+<!--                data-test="jet-finder-sort"-->
+<!--                :options="sortOptions"-->
+<!--                empty="Sort"-->
+<!--                name="sort"-->
+<!--            />-->
 
             <span
-                v-if="$slots['filters']"
+                v-if="filters.length"
                 :class="{
-                  'bg-gray-200 border-black border-2': isFiltering,
+                  'bg-gray-200 border-black border-2 font-bold': isFiltering,
                   'bg-white': !isFiltering,
                 }"
-                class="select rounded-md border border-gray-300 cursor-pointer"
+                class=" rounded-md border border-gray-300 cursor-pointer flex space-x-2 items-center px-3 shadow"
                 data-test="jet-finder-filter-trigger"
                 @click="filtering = true"
             >
-        Filters
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" :class="{'text-black': isFiltering}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                <span>Filters</span>
       </span>
     </div>
         <teleport to="body">
             <div
-                v-if="$slots['filters'] && filtering"
+                v-if="filters.length && filtering"
                 aria-labelledby="slide-over-title"
                 aria-modal="true"
                 class="fixed inset-0 overflow-hidden z-50"
@@ -98,8 +101,18 @@
                                             aria-hidden="true"
                                             class="h-full flex justify-between flex-col"
                                         >
-                                            <div data-test="jet-finder-filters" class="flex-1 overflow-auto">
-                                                <slot :filters="filterValues" name="filters"/>
+                                            <div data-test="jet-finder-filters" class="flex-1 overflow-auto space-y-3">
+                                                <slot :filters="filterValues" name="filters">
+                                                    <div v-for="filter in filters">
+                                                        <component
+                                                            v-model="filterValues[filter.key]"
+                                                            :display="filter.display"
+                                                            v-bind="filter.props"
+                                                            :is="filter.component"
+                                                            :name="filter.key"
+                                                        />
+                                                    </div>
+                                                </slot>
                                             </div>
                                             <div class="flex space-x-4 pb-8 pt-4 border-t mt-4">
                                                 <jet-button
@@ -124,25 +137,7 @@
         </teleport>
     </div>
 </template>
-<style>
-.select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    -webkit-print-color-adjust: exact;
-    color-adjust: exact;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    padding-left: 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5rem;
-}
-</style>
+
 <script>
 import debounce from 'lodash.debounce'
 import JetInput from '../../Jetstream/Input.vue';
@@ -152,6 +147,9 @@ import {Inertia} from '@inertiajs/inertia';
 import JetButton from '../../Jetstream/Button.vue';
 import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 
+import FilterText from '../Filters/Text';
+import FilterDate from '../Filters/Date';
+import FilterSelect from '../Filters/Select';
 
 export default {
     props: {
@@ -172,6 +170,9 @@ export default {
         JetSelect,
         JetButton,
         JetSecondaryButton,
+        FilterText,
+        FilterDate,
+        FilterSelect,
     },
     beforeMount() {
         Inertia.on('start', () => {
@@ -193,7 +194,7 @@ export default {
     methods: {
         initFilters() {
             this.filters.forEach((filter) => {
-                this.filterValues[filter] = null;
+                this.filterValues[filter.key] = null;
             })
 
             if(this.filtersFill) {
@@ -220,7 +221,7 @@ export default {
         },
         clearFilters() {
             this.filters.forEach((filter) => {
-                this.filterValues[filter] = null;
+                this.filterValues[filter.key] = null;
             });
             this.filterHandler();
         },

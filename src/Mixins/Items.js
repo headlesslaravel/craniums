@@ -6,8 +6,8 @@ export default {
     mixins: [Connect],
     props: {
         url: String,
-        cells: Array,
-        data: Object,
+        fields: Array,
+        values: Object,
         selected: Array,
         click: [String, Function],
         wrapperClass: String,
@@ -95,16 +95,16 @@ export default {
                 });
         },
 
-        getItems(data) {
-            return get(data, this.itemsPath, data);
+        getItems(values) {
+            return get(values, this.itemsPath, values);
         },
-        getLinks(data) {
-            if (!data) {
+        getLinks(values) {
+            if (!values) {
                 return [];
-            } else if (data.meta && data.meta.links) {
-                return data.meta.links;
-            } else if (data.links) {
-                return data.links;
+            } else if (values.meta && values.meta.links) {
+                return values.meta.links;
+            } else if (values.links) {
+                return values.links;
             } else {
                 return [];
             }
@@ -147,13 +147,13 @@ export default {
 
             this.get(this.url)
         },
-        data: {
+        values: {
             deep: true,
             immediate: true,
-            handler(data) {
-                data = !data ? [] : data;
-                this.items = this.getItems(data);
-                this.links = this.getLinks(data);
+            handler(values) {
+                values = !values ? [] : values;
+                this.items = this.getItems(values);
+                this.links = this.getLinks(values);
             },
         },
     },

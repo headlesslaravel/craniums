@@ -1,41 +1,44 @@
 // layouts
 import SidebarLayout from "./src/Layouts/SidebarLayout";
 // items
-import JetTable from './src/Items/Table';
-import JetGrid from './src/Items/Grid';
-import JetList from './src/Items/List';
-import JetEmpty from './src/Items/Empty';
+import Table from './src/Items/Table';
+import Grid from './src/Items/Grid';
+import List from './src/Items/List';
+import Empty from './src/Items/Empty';
 // elements
 import Importer from './src/Elements/Importer';
 import Seeker from './src/Elements/Seeker';
-import JetForm from './src/Elements/Form';
-import JetDetail from './src/Elements/Detail';
-import JetFinder from './src/Elements/Finder';
-import JetSwitch from './src/Elements/Switch';
-import JetTabs from './src/Elements/Tabs';
-import JetTitle from './src/Elements/Title';
-import JetNotifications from './src/Elements/Notifications';
-import JetPagination from './src/Elements/Pagination';
-import JetDropdown from './src/Elements/Dropdown';
-import JetTimestamp from './src/Elements/Timestamp';
+import Topper from './src/Elements/Topper';
+import ItemDots from './src/Elements/ItemDots';
+import Form from './src/Elements/Form';
+import Detail from './src/Elements/Detail';
+import Finder from './src/Elements/Finder';
+import Switch from './src/Elements/Switch';
+import Tabs from './src/Elements/Tabs';
+import Heading from './src/Elements/Heading';
+import Notifications from './src/Elements/Notifications';
+import Pagination from './src/Elements/Pagination';
+import Dropdown from './src/Elements/Dropdown';
+import Timestamp from './src/Elements/Timestamp';
 import Breadcrumbs from './src/Elements/Breadcrumbs';
-import JetFlash from './src/Elements/Flash';
+import Flash from './src/Elements/Flash';
 import RelativeDates from './src/Elements/RelativeDates';
 // metrics
-import CardGroup from "./src/Metrics/CardGroup";
+import Cards from "./src/Cards/Cards";
 // query
-import JetQueryDropdown from './src/Query/Dropdown';
-import JetQueryGroup from './src/Query/Group';
-import JetQueryRange from './src/Query/Range';
+import QueryDropdown from './src/Query/Dropdown';
+import QueryGroup from './src/Query/Group';
+import QueryRange from './src/Query/Range';
 // details
-import JetDetailText from './src/Details/Text';
+import DetailText from './src/Details/Text';
 // inputs
-import JetPicker from './src/Inputs/Picker';
-import JetSelect from './src/Inputs/Select';
-import JetTextarea from './src/Inputs/Textarea';
-import JetImageInput from './src/Inputs/Image';
-import JetFileInput from './src/Inputs/File';
+import Picker from './src/Inputs/Picker';
+import Select from './src/Inputs/Select';
+import Textarea from './src/Inputs/Textarea';
+import ImageInput from './src/Inputs/Image';
+import FileInput from './src/Inputs/File';
 // mixins
+import Headless from './src/Mixins/Headless';
 import Items from './src/Mixins/Items';
 import Connect from './src/Mixins/Connect';
 import Filtering from './src/Mixins/Filtering';
@@ -58,44 +61,47 @@ export default {
         app.provide('$connectedComponents', new ConnectedComponents());
 
         app.provide('config', new DataWrapper(options));
-        app.component('jet-pagination', JetPagination);
-        app.component('jet-empty', JetEmpty);
+        app.component('Pagination', Pagination);
+        app.component('Empty', Empty);
     },
 };
 
 export {
     SidebarLayout,
-    JetTable,
-    JetGrid,
-    JetList,
+    Table,
+    Grid,
+    List,
     Seeker,
+    Topper,
+    ItemDots,
     Importer,
-    JetForm,
-    JetDetail,
-    JetFinder,
-    JetSwitch,
-    JetTitle,
-    JetTabs,
-    JetDropdown,
-    JetQueryDropdown,
-    JetQueryGroup,
-    JetQueryRange,
-    JetNotifications,
-    JetPagination,
-    JetTimestamp,
+    Form,
+    Detail,
+    Finder,
+    Switch,
+    Heading,
+    Tabs,
+    Dropdown,
+    QueryDropdown,
+    QueryGroup,
+    QueryRange,
+    Notifications,
+    Pagination,
+    Timestamp,
     Breadcrumbs,
-    JetFlash,
-    JetImageInput,
-    JetFileInput,
-    JetTextarea,
-    JetSelect,
-    JetPicker,
+    Flash,
+    ImageInput,
+    FileInput,
+    Textarea,
+    Select,
+    Picker,
     RelativeDates,
     // metrics
-    CardGroup,
+    Cards,
     // details
-    JetDetailText,
+    DetailText,
     // mixins
+    Headless,
     ToggleFilters,
     ToggleSidebar,
     Filtering,

@@ -17,14 +17,24 @@
 </template>
 
 <script>
-import MetricCount from './MetricCount'
-import CardTable from './CardTable'
+import Count from './Count'
+import Bar from './Bar'
+import Line from './Line'
+import Donut from './Donut'
+import Table from './Table'
+import Html from './Html'
+import {getCurrentInstance} from "vue";
+
 export default {
     props: ['url', 'filters'],
     inject: ['config'],
     components: {
-        MetricCount,
-        CardTable,
+        Html,
+        Count,
+        Bar,
+        Line,
+        Donut,
+        Table,
     },
     data() {
         return {
@@ -36,10 +46,13 @@ export default {
     },
     computed: {
         endpoint() {
+            let key = getCurrentInstance().vnode.key;
+            let url = route(`cards.${key}.index`)
+
             if(this.filters) {
-                return this.url + '?' + this.queryString()
+                return url + '?' + this.queryString()
             }
-            return this.url
+            return url
         }
     },
     methods: {
@@ -64,7 +77,7 @@ export default {
         },
         format(cards) {
             return cards.map(card => {
-                card.component = card.component ?? 'metric-count'
+                card.component = card.component ?? 'count'
                 card.span = card.span ?? '12'
                 card.classes = `border rounded col-span-${card.span}`;
                 if(card.link) {

@@ -130,7 +130,7 @@ import JetInput from '../../Jetstream/Input.vue';
 import JetInputError from '../../Jetstream/InputError.vue';
 import Connect from '../Mixins/Connect';
 import Config from '../Mixins/Config';
-import {str_capitalize} from "../Helpers/Str";
+import {capitalize} from "vue";
 import axios from 'axios';
 
 export default {
@@ -252,7 +252,7 @@ export default {
         defaultFieldFormat(field) {
 
             let name = field
-            let label = str_capitalize(field)
+            let label = capitalize(field)
 
             if(field.includes(':')) {
                 let parts = field.split(':')
@@ -321,7 +321,7 @@ export default {
             })
 
             handler.request({
-                url: this.action,
+                url: typeof this.action === 'function' ? this.action() : this.action,
                 data: formData,
                 method: this.formMethod.toLowerCase(),
                 headers: headers
@@ -395,7 +395,7 @@ export default {
             }
 
             if (!field.hasOwnProperty('label')) {
-                field.label = str_capitalize(field.name);
+                field.label = capitalize(field.name);
             }
 
             if (!field.hasOwnProperty('component')) {

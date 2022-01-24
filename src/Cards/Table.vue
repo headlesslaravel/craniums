@@ -3,13 +3,13 @@
         {{ card.title }}
     </div>
     <div>
-        <jet-table :data="card.value" v-bind="card.props" />
+        <Table :values="card.value" v-bind="card.props" />
     </div>
 </template>
 <script>
-import {JetTable} from "../../index";
+import {Table} from "../../index";
 export default {
     props: ['card'],
-    components: {JetTable}
+    components: {Table}
 }
 </script>

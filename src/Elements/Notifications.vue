@@ -67,7 +67,7 @@
                     style="max-height: 500px"
                     test="notifications"
                 >
-                    <jet-list v-if="loaded" :click="visit" :data="items">
+                    <List v-if="loaded" :click="visit" :data="items">
                         <template #empty>
                             <slot name="empty">
                                 <p class="py-6 text-center">All caught up</p>
@@ -128,7 +128,7 @@
                                 </div>
                             </slot>
                         </template>
-                    </jet-list>
+                    </List>
                 </div>
                 <slot name="footer">
                     <div
@@ -150,12 +150,12 @@
 </template>
 
 <script>
-import {JetList} from '../../index';
+import {List} from '../../index';
 import JetDropdown from '../../Jetstream/Dropdown.vue';
 
 export default {
     components: {
-        JetList,
+        List,
         JetDropdown,
     },
     mounted() {

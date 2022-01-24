@@ -1,0 +1,24 @@
+<template>
+    <Card>
+        <template #title>
+            {{ title }}
+        </template>
+        <template #value>
+            {{ value }}
+        </template>
+    </Card>
+</template>
+<script>
+import Card from "./Card";
+export default {
+    components: {Card},
+    props: {
+        title: String,
+        value: {
+            default() {
+                return '---'
+            }
+        }
+    }
+}
+</script>
