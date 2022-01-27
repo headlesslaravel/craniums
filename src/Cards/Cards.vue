@@ -23,7 +23,6 @@ import Line from './Line'
 import Donut from './Donut'
 import Table from './Table'
 import Html from './Html'
-import {getCurrentInstance} from "vue";
 
 export default {
     props: ['url', 'filters'],
@@ -46,7 +45,7 @@ export default {
     },
     computed: {
         endpoint() {
-            let key = getCurrentInstance().vnode.key;
+            let key = this.$.vnode.key;
             let url = route(`cards.${key}.index`)
 
             if(this.filters) {

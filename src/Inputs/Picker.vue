@@ -79,7 +79,7 @@ export default {
         JetInput,
         JetSecondaryButton,
         JetList,
-        JetFinder,
+        JetFinder, // cant have finder
     },
     props: {
         url: String,

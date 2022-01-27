@@ -19,13 +19,18 @@ export default {
         filter(event) {
             let filters = this.options[event.target.value]
 
-            // TODO if v-model, else route to current with filters
-            this.$emit('update:modelValue', filters);
+            if(this.$attrs.hasOwnProperty('onUpdate:modelValue')) {
+                this.$emit('update:modelValue', {
+                    from:filters.from,
+                    to:filters.to
+                });
+            } else {
+                this.$inertia.get(route(route().current()), {
+                    from: filters.from,
+                    to: filters.to,
+                })
+            }
 
-            this.$inertia.get(route(route().current()), {
-                from: filters.from,
-                to: filters.to,
-            })
         }
     }
 }

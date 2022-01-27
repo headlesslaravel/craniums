@@ -34,15 +34,6 @@
                 </div>
             </div>
 
-            <jet-select
-                v-if="trashed"
-                v-query:[connect]="trashHandler"
-                data-test="jet-finder-trash"
-                :options="trashOptions"
-                empty="Not Trashed"
-                name="trash"
-            />
-
 <!--            <jet-select-->
 <!--                v-if="sort"-->
 <!--                v-query:[connect]="sortHandler"-->
@@ -150,6 +141,7 @@ import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 import FilterText from '../Filters/Text';
 import FilterDate from '../Filters/Date';
 import FilterSelect from '../Filters/Select';
+import FilterCheckbox from '../Filters/Checkbox';
 
 export default {
     props: {
@@ -173,6 +165,7 @@ export default {
         FilterText,
         FilterDate,
         FilterSelect,
+        FilterCheckbox,
     },
     beforeMount() {
         Inertia.on('start', () => {

@@ -115,11 +115,11 @@
                 </div>
             </slot>
         </form>
+        <div
+            v-if="false"
+            class="col-span-1 col-span-2 col-span-3 col-span-4 col-span-5 col-span-6 col-span-7 col-span-8 col-span-9 col-span-10 col-span-11 col-span-12"
+        ></div>
     </div>
-    <div
-        v-if="false"
-        class="col-span-1 col-span-2 col-span-3 col-span-4 col-span-5 col-span-6 col-span-7 col-span-8 col-span-9 col-span-10 col-span-11 col-span-12"
-    ></div>
 </template>
 
 <script>
@@ -226,7 +226,7 @@ export default {
             });
 
             if(this.fields) {
-                // exclude invalid :values
+                // exclude :values not defined in :fields
                 Object.keys(values).forEach(key => {
                     if(!this.fieldNames.includes(key)) {
                         delete values[key]
@@ -234,6 +234,7 @@ export default {
                 })
             }
 
+            // allow component level manual override via :merge={key: value}
             if(this.merge) {
                 Object.keys(this.merge).forEach(key => {
                     values[key] = this.merge[key]
@@ -314,16 +315,25 @@ export default {
                 headers['Wants-Json'] = true
             }
 
-            let formData = new FormData;
+            let data = new FormData;
 
             this.fieldsFormatted.forEach(field => {
-                formData.append(field.name, this.formValues[field.name])
+                data.append(field.name, this.formValues[field.name])
             })
 
+            let method = this.formMethod.toLowerCase();
+
+            if(method === 'put') {
+                method = 'post'
+                data.append('_method', 'PUT')
+            }
+
+            let url = typeof this.action === 'function' ? this.action() : this.action
+
             handler.request({
-                url: typeof this.action === 'function' ? this.action() : this.action,
-                data: formData,
-                method: this.formMethod.toLowerCase(),
+                url: url,
+                data: data,
+                method: method,
                 headers: headers
             }).then((response) => {
                 this.reset()
