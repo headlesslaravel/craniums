@@ -1,6 +1,6 @@
 {
     "name": "@craniums/vue",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Vue + Tailwind components for Headless Laravel",
     "main": "src/index.js",
     "scripts": {
