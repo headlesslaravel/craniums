@@ -49,6 +49,13 @@ export default {
                 }
             }
 
+            if(route().has(base + '.exports.index')) {
+                resource['imports'] = {
+                    create: route(base + '.imports.create'),
+                    store: route(base + '.imports.store'),
+                }
+            }
+
             return {
                 ...resource,
                 get(key, params) {

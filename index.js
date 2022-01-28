@@ -22,7 +22,7 @@ import Dropdown from './src/Elements/Dropdown';
 import Timestamp from './src/Elements/Timestamp';
 import Breadcrumbs from './src/Elements/Breadcrumbs';
 import Flash from './src/Elements/Flash';
-import RelativeDates from './src/Elements/RelativeDates';
+import DateInterval from './src/Inputs/DateInterval';
 // metrics
 import Cards from "./src/Cards/Cards";
 // query
@@ -95,7 +95,7 @@ export {
     Textarea,
     Select,
     Picker,
-    RelativeDates,
+    DateInterval,
     // metrics
     Cards,
     // details

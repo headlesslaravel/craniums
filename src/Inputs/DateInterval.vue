@@ -12,7 +12,7 @@
 export default {
     computed: {
         options() {
-            return this.$page.props.relativeDates
+            return this.$page.props.dateIntervals
         }
     },
     methods: {
