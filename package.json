@@ -1,10 +1,11 @@
 {
     "name": "@craniums/vue",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Vue + Tailwind components for Headless Laravel",
     "main": "src/index.js",
     "scripts": {
         "test": "cypress open-ct",
+        "pub": "npm version patch --force && npm publish",
         "ci": "cypress run-ct"
     },
     "repository": {
