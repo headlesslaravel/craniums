@@ -6,7 +6,10 @@
     "scripts": {
         "test": "cypress open-ct",
         "pub": "npm version patch --force && npm publish",
-        "ci": "cypress run-ct"
+        "ci": "cypress run-ct",
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
     },
     "repository": {
         "type": "git",
