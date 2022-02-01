@@ -1,5 +1,8 @@
 <template>
-    <p>Hello World</p>
+    <Table
+        :fields="['id', 'title']"
+        :values="[{id: 1, title: 'Hello'}]"
+    />
 </template>
 
 <style>
@@ -12,3 +15,9 @@
     margin-top: 60px;
 }
 </style>
+<script>
+import Table from "../src/Items/Table.vue";
+export default {
+    components: {Table}
+}
+</script>
