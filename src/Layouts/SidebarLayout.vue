@@ -267,9 +267,9 @@
 <script>
 import { defineComponent } from 'vue';
 import { Head, Link } from '@inertiajs/inertia-vue3';
-import JetFlash from '../Elements/Flash';
+import JetFlash from '../Elements/Flash.vue';
 import get from 'lodash.get'
-import Seeker from "../Elements/Seeker";
+import Seeker from "../Elements/Seeker.vue";
 
 export default defineComponent({
     inject: ['config'],

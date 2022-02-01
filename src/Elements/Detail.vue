@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import { str_capitalize } from '../Helpers/Str'
-import Config from '../Mixins/Config';
+import { str_capitalize } from '../Helpers/Str.js'
+import Config from '../Mixins/Config.js';
 import {markRaw} from 'vue';
 
 export default {

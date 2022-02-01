@@ -20,7 +20,7 @@
 
 <script>
 import {Link} from "@inertiajs/inertia-vue3";
-import Dropdown from "./Dropdown";
+import Dropdown from "./Dropdown.vue";
 export default {
     components: {
         Dropdown,

@@ -1,5 +1,5 @@
 import set from 'lodash.set';
-import DataWrapper from '../Classses/DataWrapper';
+import DataWrapper from '../Classses/DataWrapper.js';
 
 // config[fields][bio][component]="jet-textarea"
 

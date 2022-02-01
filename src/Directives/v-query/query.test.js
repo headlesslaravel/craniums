@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import Query from './query';
+import Query from './query.js';
 
 test('using data-children to remove children from payload on change', () => {
     let payload = {country: 1, state:2, city:3}

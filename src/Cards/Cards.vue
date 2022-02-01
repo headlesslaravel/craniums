@@ -17,12 +17,12 @@
 </template>
 
 <script>
-import Count from './Count'
-import Bar from './Bar'
-import Line from './Line'
-import Donut from './Donut'
-import Table from './Table'
-import Html from './Html'
+import Count from './Count.vue'
+import Bar from './Bar.vue'
+import Line from './Line.vue'
+import Donut from './Donut.vue'
+import Table from './Table.vue'
+import Html from './Html.vue'
 
 export default {
     props: ['url', 'filters'],

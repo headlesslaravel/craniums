@@ -1,5 +1,5 @@
 import { Inertia } from '@inertiajs/inertia';
-import Query from './query';
+import Query from './query.js';
 
 let nav = (parameters) => {
     Inertia.get(

@@ -54,9 +54,9 @@
 </template>
 
 <script>
-import Items from '../Mixins/Items';
-import { str_capitalize } from '../Helpers/Str';
-import TableHeading from "./TableHeading";
+import Items from '../Mixins/Items.js';
+import { str_capitalize } from '../Helpers/Str.js';
+import TableHeading from "./TableHeading.vue";
 
 export default {
     mixins: [Items],

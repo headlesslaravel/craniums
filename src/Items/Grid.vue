@@ -22,7 +22,7 @@
     </div>
 </template>
 <script>
-import Items from '../Mixins/Items';
+import Items from '../Mixins/Items.js';
 
 export default {
     mixins: [Items],

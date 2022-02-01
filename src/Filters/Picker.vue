@@ -20,7 +20,7 @@
 // and the FilterPicker is using finder
 // creating circular dependencies
 // import Picker from "../Inputs/Picker";
-import Autocomplete from "../Inputs/Autocomplete";
+import Autocomplete from "../Inputs/Autocomplete.vue";
 export default {
     // components: {Picker},
     components: {Autocomplete},

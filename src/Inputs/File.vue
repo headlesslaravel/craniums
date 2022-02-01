@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import SecondaryButton from './SecondaryButton';
+import SecondaryButton from './SecondaryButton.vue';
 
 export default {
     components: {SecondaryButton},

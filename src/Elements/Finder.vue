@@ -133,15 +133,15 @@
 import debounce from 'lodash.debounce'
 import JetInput from '../../Jetstream/Input.vue';
 import JetSelect from '../Inputs/Select.vue';
-import Connect from '../Mixins/Connect';
+import Connect from '../Mixins/Connect.js';
 import {Inertia} from '@inertiajs/inertia';
 import JetButton from '../../Jetstream/Button.vue';
 import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 
-import FilterText from '../Filters/Text';
-import FilterDate from '../Filters/Date';
-import FilterSelect from '../Filters/Select';
-import FilterCheckbox from '../Filters/Checkbox';
+import FilterText from '../Filters/Text.vue';
+import FilterDate from '../Filters/Date.vue';
+import FilterSelect from '../Filters/Select.vue';
+import FilterCheckbox from '../Filters/Checkbox.vue';
 
 export default {
     props: {

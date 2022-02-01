@@ -31,9 +31,9 @@
     </Heading>
 </template>
 <script>
-import Heading from './Heading'
-import Importer from './Importer'
-import Dropdown from "./Dropdown";
+import Heading from './Heading.vue'
+import Importer from './Importer.vue'
+import Dropdown from "./Dropdown.vue";
 
 export default {
     components: {

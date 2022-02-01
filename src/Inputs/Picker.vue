@@ -68,8 +68,8 @@ import JetInput from '../../Jetstream/Input.vue';
 import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 import JetFinder from '../Elements/Finder.vue'
 import JetList from '../Items/List.vue'
-import Connect from "../Mixins/Connect";
-import Empty from "../Items/Empty";
+import Connect from "../Mixins/Connect.js";
+import Empty from "../Items/Empty.vue";
 
 export default {
     mixins: [Connect],

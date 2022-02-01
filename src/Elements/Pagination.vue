@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Connect from '../Mixins/Connect';
+import Connect from '../Mixins/Connect.js';
 
 export default {
     mixins: [Connect],

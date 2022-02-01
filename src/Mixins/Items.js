@@ -1,4 +1,4 @@
-import Connect from './Connect';
+import Connect from './Connect.js';
 import get from 'lodash.get';
 import axios from 'axios';
 

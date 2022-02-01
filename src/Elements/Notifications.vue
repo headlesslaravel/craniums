@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import {List} from '../../index';
+import {List} from '../../index.js';
 import JetDropdown from '../../Jetstream/Dropdown.vue';
 
 export default {
