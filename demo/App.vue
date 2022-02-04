@@ -2,6 +2,7 @@
     <Table
         :fields="['id', 'title']"
         :values="[{id: 1, title: 'Hello'}]"
+        paginate='more'
     />
 </template>
 

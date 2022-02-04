@@ -43,7 +43,7 @@
                     </tbody>
                 </table>
             </div>
-            <Pagination :connect="connect" :links="links" class="p-5 border-t"/>
+            <Pagination :paginate='paginate' :connect="connect" :links="links" class="p-5 border-t"/>
         </div>
         <div v-else>
             <slot name="empty">
@@ -57,11 +57,13 @@
 import Items from '../Mixins/Items.js';
 import { str_capitalize } from '../Helpers/Str.js';
 import TableHeading from "./TableHeading.vue";
+import Pagination from '../Elements/Pagination.vue'
 
 export default {
     mixins: [Items],
     components: {
         TableHeading,
+        Pagination
     },
     props: {
         sort: {

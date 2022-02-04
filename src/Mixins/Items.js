@@ -32,6 +32,10 @@ export default {
         },
         refreshOnChange: {
             type: [String, Number, Boolean] // TODO: debounce 1000 so you can toggle on off quickly
+        },
+        paginate: {
+            type: String,
+            default: 'numbers'
         }
     },
     created() {
