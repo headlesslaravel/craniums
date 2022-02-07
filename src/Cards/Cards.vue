@@ -46,7 +46,7 @@ export default {
     computed: {
         endpoint() {
             let key = this.$.vnode.key;
-            let url = route(`cards.${key}.index`)
+            let url = this.url ? this.url : route(`cards.${key}.index`)
 
             if(this.filters) {
                 return url + '?' + this.queryString()
