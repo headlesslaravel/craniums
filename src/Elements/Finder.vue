@@ -27,21 +27,29 @@
                         autocomplete="off"
                         class="focus:ring-gray-500 focus:border-gray-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                         name="search"
-                        data-test="jet-finder-search"
+                        data-test="cranium-finder-search"
                         placeholder="Search"
                         type="text"
                     />
                 </div>
             </div>
 
-<!--            <jet-select-->
-<!--                v-if="sort"-->
-<!--                v-query:[connect]="sortHandler"-->
-<!--                data-test="jet-finder-sort"-->
-<!--                :options="sortOptions"-->
-<!--                empty="Sort"-->
-<!--                name="sort"-->
-<!--            />-->
+            <jet-select
+                v-if="sort"
+                v-query:[connect]="sortHandler"
+                data-test="cranium-finder-sort"
+                :options="sortOptions"
+                empty="Sort"
+                name="sort"
+            />
+
+            <jet-select
+                v-if="trashed"
+                v-query:[connect]="trashHandler"
+                data-test="cranium-finder-trash"
+                :options="trashOptions"
+                empty="Trash"
+            />
 
             <span
                 v-if="filters.length"
@@ -50,7 +58,7 @@
                   'bg-white': !isFiltering,
                 }"
                 class=" rounded-md border border-gray-300 cursor-pointer flex space-x-2 items-center px-3 shadow"
-                data-test="jet-finder-filter-trigger"
+                data-test="cranium-finder-filter-trigger"
                 @click="filtering = true"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" :class="{'text-black': isFiltering}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,16 +72,16 @@
                 v-if="filters.length && filtering"
                 aria-labelledby="slide-over-title"
                 aria-modal="true"
-                class="fixed inset-0 overflow-hidden z-50"
+                class="fixed inset-0 overflow-hidden z-20"
                 role="dialog"
             >
                 <div class="absolute inset-0 overflow-hidden">
                     <div
                         aria-hidden="true"
-                        class="absolute w-full h-screen transition-opacity bg-black opacity-50 z-40"
+                        class="absolute w-full h-screen transition-opacity bg-black opacity-50 z-20"
                         @click="filtering = false"
                     ></div>
-                    <div class="z-50 fixed inset-y-0 right-0 pl-10 max-w-full flex">
+                    <div class="z-20 fixed inset-y-0 right-0 pl-10 max-w-full flex">
                         <div class="relative w-screen max-w-md">
                             <div
                                 class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll"
@@ -92,28 +100,34 @@
                                             aria-hidden="true"
                                             class="h-full flex justify-between flex-col"
                                         >
-                                            <div data-test="jet-finder-filters" class="flex-1 overflow-auto space-y-3">
+                                            <div data-test="cranium-finder-filters" class="flex-1 overflow-auto space-y-3">
                                                 <slot :filters="filterValues" name="filters">
-                                                    <div v-for="filter in filters">
+                                                    <div v-for="filter in filtersWithBindings">
                                                         <component
-                                                            v-model="filterValues[filter.key]"
-                                                            :display="filter.display"
-                                                            v-bind="filter.props"
                                                             :is="filter.component"
+                                                            :display="filter.display"
+                                                            v-bind="filter.bindings"
                                                             :name="filter.key"
                                                         />
+<!--                                                        <component-->
+<!--                                                            :is="filter.component"-->
+<!--                                                            v-model="filterValues[filter.key]"-->
+<!--                                                            :display="filter.display"-->
+<!--                                                            :name="filter.key"-->
+<!--                                                            v-bind="filter.props"-->
+<!--                                                        />-->
                                                     </div>
                                                 </slot>
                                             </div>
                                             <div class="flex space-x-4 pb-8 pt-4 border-t mt-4">
                                                 <jet-button
                                                     @click="filterHandler"
-                                                    data-test="jet-finder-filters-submit">
+                                                    data-test="cranium-finder-filters-submit">
                                                     Filter
                                                 </jet-button>
                                                 <jet-secondary-button
                                                     @click="clearFilters"
-                                                    data-test="jet-finder-filters-clear">
+                                                    data-test="cranium-finder-filters-clear">
                                                     Clear
                                                 </jet-secondary-button>
                                             </div>
@@ -140,6 +154,7 @@ import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
 
 import FilterText from '../Filters/Text.vue';
 import FilterDate from '../Filters/Date.vue';
+import FilterRange from '../Filters/Range.vue';
 import FilterSelect from '../Filters/Select.vue';
 import FilterCheckbox from '../Filters/Checkbox.vue';
 
@@ -164,6 +179,7 @@ export default {
         JetSecondaryButton,
         FilterText,
         FilterDate,
+        FilterRange,
         FilterSelect,
         FilterCheckbox,
     },
@@ -213,13 +229,18 @@ export default {
             });
         },
         clearFilters() {
-            this.filters.forEach((filter) => {
-                this.filterValues[filter.key] = null;
-            });
-            this.filterHandler();
+
+            this.filterValues = {}
+
+            this.applyHandler('filter', 'onFilter', {})
         },
         filterValue(key) {
             return this.filterValues[key];
+        },
+        handleFilterWithModifier(payload) {
+            Object.entries(payload).forEach(([key, value]) => {
+                this.filterValues[key] = value
+            })
         },
         searchHandler: debounce(function(payload) {
             this.applyHandler('search', 'onSearch', payload)
@@ -246,9 +267,7 @@ export default {
             } else if (this.connect) {
                 this.connectChanged('updateQuery', payload);
             } else {
-                this.$inertia.get(window.location.pathname, payload, {
-                    preserveState: true,
-                });
+                Inertia.get(window.location.pathname, payload);
             }
         },
         displayFormat(item) {
@@ -260,6 +279,41 @@ export default {
         },
     },
     computed: {
+        filtersWithBindings() {
+            // workaround for inertia/issues/775
+            let filters = JSON.parse(JSON.stringify(this.filters));
+
+            let urlSearchParams = new URLSearchParams(window.location.search);
+
+            return filters.map(filter => {
+
+                filter.bindings = {
+                    ...filter.props
+                }
+
+                if(filter.modifiers.length > 0) {
+
+                    filter.modifiers.forEach(modifier => {
+
+                        let queryParameter = `${filter.key}:${modifier}`; // posts:min
+
+                        filter.bindings[modifier] = urlSearchParams.get(queryParameter)
+
+                        this.filterValues[queryParameter] = filter.bindings[modifier]
+
+                        filter.bindings[`onUpdate:${modifier}`] = (value) => {
+                            this.filterValues[queryParameter] = value
+                        }
+                    })
+                } else {
+                    filter.bindings['onUpdate:modelValue'] = (value) => {
+                        this.filterValues[filter.key] = value
+                    }
+                }
+
+                return filter;
+            })
+        },
         isFiltering() {
             return (
                 Object.keys(this.filterValues).filter((key) => {

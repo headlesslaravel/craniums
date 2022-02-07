@@ -1,6 +1,6 @@
 <template>
-    <div class="block w-full h-full">
-        <form class="block w-full h-full">
+    <div class="block w-full h-full relative">
+        <form class="block w-full h-full z-20 relative">
             <input
                 id="search-field"
                 name="search-field"
@@ -11,19 +11,25 @@
                 type="search"
             />
         </form>
-        <div class="z-50 bg-white shadow-lg border-t p-5" v-if="results.length">
-            <div v-for="result in results">
-                <div v-if="result.data.length">
-                    <span class="font-bold py-2 block capitalize border-b mb-2">
-                        {{ result.meta.resource }}
-                    </span>
-                    <ul class="pl-5">
-                        <li v-for="item in result.data" class="py-1 hover:text-black transition-all">
-                            <Link :href="route(result.meta.route, item.value)">
+        <div v-if="results.length" class="z-50 bg-white shadow-lg border-t absolute w-2/3 overflow-auto" style="max-height: 400px">
+            <div v-if="mode === 'tab'">
+                <div class="flex space-x-5 p-5 border-b sticky top-0 bg-white">
+                    <div v-for="result in results" :key="result.meta.resource">
+                        <div v-if="result.data.length">
+                            <span @click="tab = result.meta.resource" class="cursor-pointer hover:underline" :class="{'font-bold': tab === result.meta.resource}">
+                                {{ display(result.meta.resource) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div v-for="result in results" :key="result.meta.resource">
+                        <div v-if="tab === result.meta.resource && result.data.length">
+                            <Link :href="route(result.meta.route, item.value)" v-for="item in result.data" :key="result.meta.resource+item.value" class="truncate block px-5 py-4 text-sm border-b hover:bg-gray-50 transition-all">
                                 {{ item.display }}
                             </Link>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -32,21 +38,30 @@
 <script>
 import axios from 'axios';
 import {Link} from '@inertiajs/inertia-vue3'
+import {capitalize} from "vue";
 
 export default {
     components: {
         Link
     },
     props: {
-        url: {String}
+        url: {String},
+        mode: {
+            type: String,
+            default: 'tab',
+        }
     },
     data() {
       return {
           term: '',
+          tab: '',
           results: {}
       }
     },
     methods: {
+        display(resource) {
+            return capitalize(resource.replaceAll('-', ' '))
+        },
         search() {
             if(!this.term) {
                 this.results = {}
@@ -54,7 +69,13 @@ export default {
             }
 
             axios.get(this.url.trim('/')+'?term='+this.term).then(response => {
-                this.results = response.data.data;
+                let withResults = response.data.data.filter(result => {
+                    return result.data.length
+                })
+
+                this.tab = withResults[0].meta.resource;
+
+                this.results = withResults;
             })
         }
     },

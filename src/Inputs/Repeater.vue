@@ -70,10 +70,15 @@ export default {
         }
     },
     mounted() {
-      this.modelValue.forEach((row, index) => {
-          this.ids.push(`repeater-row-${index}`)
-          this.localErrors.push({})
-      })
+        if(!Array.isArray(this.modelValue)) {
+            this.$emit('update:modelValue', [])
+            return;
+        }
+
+        this.modelValue.forEach((row, index) => {
+            this.ids.push(`repeater-row-${index}`)
+            this.localErrors.push({})
+        })
     },
     methods: {
         add(event) {

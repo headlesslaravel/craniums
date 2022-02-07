@@ -40,14 +40,14 @@ describe('Finder Setup', () => {
     it('can view with trashed', () => {
         const onTrashSpy = cy.spy().as('onTrashSpy')
         cy.mount(<Finder onTrash={onTrashSpy} trashed={true}/>)
-        cy.get('select[name="trash"]').select('With Trashed')
+        cy.get('[data-test="cranium-finder-trash"]').select('With Trashed')
         cy.get('@onTrashSpy').should('have.been.calledOnceWithExactly', {"with-deleted": 'true'})
     })
 
     it('can view only trashed', () => {
         const onTrashSpy = cy.spy().as('onTrashSpy')
         cy.mount(<Finder onTrash={onTrashSpy} trashed={true}/>)
-        cy.get('select[name="trash"]').select('Only Trashed')
+        cy.get('[data-test="cranium-finder-trash"]').select('Only Trashed')
         cy.get('@onTrashSpy').should('have.been.calledOnceWithExactly', {"only-deleted": 'true'})
     })
 })

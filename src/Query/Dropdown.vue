@@ -1,5 +1,5 @@
 <template>
-    <jet-dropdown :width="60" align="right">
+    <cranium-dropdown :width="60" align="right">
         <template #trigger>
       <span class="inline-flex rounded-md mr-3">
         <button
@@ -31,7 +31,7 @@
                 <slot/>
             </div>
         </template>
-    </jet-dropdown>
+    </cranium-dropdown>
 </template>
 <script>
 import JetDropdown from '../../Jetstream/Dropdown.vue'

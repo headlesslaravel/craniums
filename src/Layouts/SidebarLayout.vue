@@ -2,7 +2,7 @@
     <div>
         <Head :title="title" />
 
-        <jet-flash />
+        <Flash />
 
         <div class="relative h-screen flex overflow-hidden ">
 
@@ -267,7 +267,7 @@
 <script>
 import { defineComponent } from 'vue';
 import { Head, Link } from '@inertiajs/inertia-vue3';
-import JetFlash from '../Elements/Flash.vue';
+import Flash from '../Elements/Flash.vue';
 import get from 'lodash.get'
 import Seeker from "../Elements/Seeker.vue";
 
@@ -275,7 +275,7 @@ export default defineComponent({
     inject: ['config'],
     components: {
         Seeker,
-        JetFlash,
+        Flash,
         Head,
         Link,
     },
