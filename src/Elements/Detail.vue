@@ -1,5 +1,5 @@
 <template>
-    <div class="border-gray-200 px-4 py-5 sm:p-0" data-test="jet-detail">
+    <div class="border-gray-200 px-4 py-5 sm:p-0" data-test="cranium-detail">
         <dl class="sm:divide-y sm:divide-gray-200">
             <div
                 v-for="item in valuesFormatted"
@@ -7,7 +7,7 @@
             >
                 <slot :name="`row.${item.key}`" :value="item.value">
                     <slot :name="`key.${item.key}.all`">
-                        <dt :data-test="`jet-detail-key-${item.key}`"
+                        <dt :data-test="`cranium-detail-key-${item.key}`"
                             class="capitalize text-sm font-medium text-gray-500 py-4">
                             <slot :name="`item.key.${item.key}`" :value="item.value">
                                 {{ item.display }}
@@ -15,7 +15,7 @@
                         </dt>
                     </slot>
                     <slot :name="`value.${item.key}.all`" :value="item.value">
-                        <dd :data-test="`jet-detail-value-${item.key}`"
+                        <dd :data-test="`cranium-detail-value-${item.key}`"
                             class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 py-4">
                             <slot :name="`value.${item.key}`" :value="item.value">
                                 <component

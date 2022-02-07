@@ -1,5 +1,5 @@
 <template>
-    <div data-test="jet-form">
+    <div data-test="cranium-form">
         <form :action="action" :method="formMethod" class="w-full" @submit.prevent="submit">
             <div v-if="success" class="bg-white p-5 border-b">
                 <slot name="success">
@@ -61,7 +61,7 @@
                                                 :placeholder="field.label"
                                                 autocomplete="new-password"
                                                 class="w-full"
-                                                :data-test="`jet-input-${field.name}`"
+                                                :data-test="`cranium-input-${field.name}`"
                                                 :autofocus="field.name === autofocus"
                                                 v-bind="field.props"
                                             />
@@ -69,7 +69,7 @@
 
                                         <!-- TODO: errorsFormatted to avoid multiple formats                    -->
                                         <!-- TODO: fields.title.error slot -->
-                                        <div v-if="errors && errors.hasOwnProperty(field.name)" :data-test="`jet-form-error-${field.name}`">
+                                        <div v-if="errors && errors.hasOwnProperty(field.name)" :data-test="`cranium-form-error-${field.name}`">
                                             <JetInputError
                                                 v-if="Array.isArray(errors[field.name])"
                                                 :message="errors[field.name][0]"
@@ -106,7 +106,7 @@
                     <slot :submit="submit" name="submit">
                         <jet-button
                             :class="{ 'opacity-25': processing }"
-                            data-test="jet-form-submit"
+                            data-test="cranium-form-submit"
                             :disabled="processing"
                         >
                             {{ formMethod === 'POST' ? 'Create' : 'Update' }}
@@ -222,7 +222,7 @@ export default {
             this.fieldsFormatted.forEach((field) => {
                 values[field.name] = values.hasOwnProperty(field.name)
                     ? values[field.name]
-                    : field.value;
+                    : field.value ?? '';
             });
 
             if(this.fields) {

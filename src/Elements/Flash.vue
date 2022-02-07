@@ -7,7 +7,7 @@
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
         >
-        <div v-show="message && open" data-test="jet-flash" class="absolute top-0 w-full z-50">
+        <div v-show="message && open" data-test="cranium-flash" class="absolute top-0 w-full z-50">
             <div class="flex bg-green-500 text-white p-5">
                 <svg v-if="['store', 'update', 'restore'].includes(type)" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -174,10 +174,10 @@ export default {
     computed: {
         test() {
             if(this.connect) {
-                return `jet-table-${this.connect}`
+                return `cranium-table-${this.connect}`
             }
 
-            return 'jet-table'
+            return 'cranium-table'
         }
     }
 };
