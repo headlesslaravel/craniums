@@ -8,13 +8,13 @@
             </div>
             <div
                 v-if="fieldsFormatted.length"
-                class="bg-white p-5 grid grid-cols-12 gap-4"
+                class="grid grid-cols-12 gap-4"
             >
                 <div
                     v-for="(field, index) in fieldsFormatted"
-                    :key="field.name"
+                    :key="field.key"
                     :class="`col-span-${field.span}`"
-                    :data-test="`field-${field.name}`"
+                    :data-test="`field-${field.key}`"
                 >
                     <div v-if="visibility(field.visible)">
                         <div v-if="field.hasOwnProperty('divider')" class="border-b pb-5"/>
@@ -29,16 +29,16 @@
 
                         <slot
                             v-else
-                            :error="getError(field.name)"
+                            :error="getError(field.key)"
                             :errors="errors"
                             :index="index"
-                            :name="`field.${field.name}.all`"
+                            :name="`field.${field.key}.all`"
                             :values="formValues"
                         >
                             <div class="py-2">
-                                <slot :name="`label.${field.name}`">
+                                <slot :name="`label.${field.key}`">
                                     <jet-label
-                                        :for="field.name"
+                                        :for="field.key"
                                         :value="field.label"
                                     />
                                 </slot>
@@ -47,36 +47,36 @@
                                     <div>
                                         <slot
                                             :index="index"
-                                            :name="`field.${field.name}`"
+                                            :name="`field.${field.key}`"
                                             :values="formValues"
                                             :errors="errors"
                                         >
                                             <component
                                                 :is="field.component"
-                                                :id="field.name"
-                                                v-model="formValues[field.name]"
+                                                :field="field"
+                                                v-model="formValues[field.key]"
                                                 :class="{ disabled: processing }"
                                                 :disabled="processing"
-                                                :name="field.name"
+                                                :name="field.key"
                                                 :placeholder="field.label"
                                                 autocomplete="new-password"
                                                 class="w-full"
-                                                :data-test="`cranium-input-${field.name}`"
-                                                :autofocus="field.name === autofocus"
+                                                :data-test="`cranium-input-${field.key}`"
+                                                :autofocus="field.key === autofocus"
                                                 v-bind="field.props"
                                             />
                                         </slot>
 
                                         <!-- TODO: errorsFormatted to avoid multiple formats                    -->
                                         <!-- TODO: fields.title.error slot -->
-                                        <div v-if="errors && errors.hasOwnProperty(field.name)" :data-test="`cranium-form-error-${field.name}`">
+                                        <div v-if="errors && errors.hasOwnProperty(field.key)" :data-test="`cranium-form-error-${field.key}`">
                                             <JetInputError
-                                                v-if="Array.isArray(errors[field.name])"
-                                                :message="errors[field.name][0]"
+                                                v-if="Array.isArray(errors[field.key])"
+                                                :message="errors[field.key][0]"
                                             />
                                             <JetInputError
                                                 v-else
-                                                :message="errors[field.name]"
+                                                :message="errors[field.key]"
                                             />
                                         </div>
                                     </div>
@@ -132,9 +132,18 @@ import Connect from '../Mixins/Connect.js';
 import Config from '../Mixins/Config.js';
 import {capitalize} from "vue";
 import axios from 'axios';
+// Fields
+import Text from '../Fields/Text.vue';
+import Textarea from '../Fields/Textarea.vue';
+import Select from '../Fields/Select.vue';
+import Picker from '../Fields/Picker.vue';
 
 export default {
     components: {
+        Text,
+        Textarea,
+        Select,
+        Picker,
         JetLabel,
         JetInput,
         JetButton,
@@ -220,8 +229,8 @@ export default {
             }
 
             this.fieldsFormatted.forEach((field) => {
-                values[field.name] = values.hasOwnProperty(field.name)
-                    ? values[field.name]
+                values[field.key] = values.hasOwnProperty(field.key)
+                    ? values[field.key]
                     : field.value ?? '';
             });
 
@@ -252,20 +261,20 @@ export default {
         },
         defaultFieldFormat(field) {
 
-            let name = field
+            let key = field
             let label = capitalize(field)
 
             if(field.includes(':')) {
                 let parts = field.split(':')
-                name = parts[0]
+                key = parts[0]
                 label = parts[1]
             }
 
             let output = {
-                name: name,
+                key: key,
                 label: label,
                 component: 'jet-input',
-                visible: this.isVisible(name),
+                visible: this.isVisible(key),
                 props: {
                     type: 'text',
                 },
@@ -318,7 +327,7 @@ export default {
             let data = new FormData;
 
             this.fieldsFormatted.forEach(field => {
-                data.append(field.name, this.formValues[field.name])
+                data.append(field.key, this.formValues[field.key])
             })
 
             let method = this.formMethod.toLowerCase();
@@ -366,21 +375,21 @@ export default {
                 }
             })
         },
-        isVisible(name) {
-            return !this.hidden || ! this.hidden.includes(name)
+        isVisible(key) {
+            return !this.hidden || ! this.hidden.includes(key)
         },
         navigate(url) {
             if(this.$inertia) {
                 this.$inertia.get(url)
             }
         },
-        getError(name) {
+        getError(key) {
             // todo: normalize the errors array instead
-            if (this.errors && this.errors.hasOwnProperty(name)) {
-                if (Array.isArray(this.errors[name])) {
-                    return this.errors[name][0];
+            if (this.errors && this.errors.hasOwnProperty(key)) {
+                if (Array.isArray(this.errors[key])) {
+                    return this.errors[key][0];
                 } else {
-                    return this.errors[name];
+                    return this.errors[key];
                 }
             }
 
@@ -391,9 +400,9 @@ export default {
         },
         addFieldMissing(field) {
             if (field.hasOwnProperty('divider')) {
-                return {...field, name: 'divider', span: 12};
+                return {...field, key: 'divider', span: 12};
             } else if (field.hasOwnProperty('section_title')) {
-                return {...field, name: 'section_title', span: 12};
+                return {...field, key: 'section_title', span: 12};
             }
 
             if (!field.hasOwnProperty('span')) {
@@ -401,11 +410,11 @@ export default {
             }
 
             if (!field.hasOwnProperty('visible')) {
-                field.visible = this.isVisible(field.name);
+                field.visible = this.isVisible(field.key);
             }
 
             if (!field.hasOwnProperty('label')) {
-                field.label = capitalize(field.name);
+                field.label = capitalize(field.key);
             }
 
             if (!field.hasOwnProperty('component')) {
@@ -427,7 +436,7 @@ export default {
             return this.$attrs && this.$attrs.onCancel;
         },
         fieldNames() {
-            return this.fieldsFormatted.map(field => field.name)
+            return this.fieldsFormatted.map(field => field.key)
         },
         fieldsFormatted() {
             if (this.fields.length === 0) {

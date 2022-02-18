@@ -41,7 +41,7 @@ export default {
         Modal,
     },
     props: {
-        value: String,
+        value: [String, Number],
         mode: {
             type: String,
             default: 'none',

@@ -1,7 +1,7 @@
 <template>
     <div>
         <p>{{ display }}</p>
-        <input
+        <Input
             :name="name"
             @change="$emit('update:modelValue', $event.target.value)"
             :value="modelValue"
@@ -12,7 +12,12 @@
 </template>
 
 <script>
+import Input from "../Inputs/Input";
 export default {
+  inheritAttrs: false,
+  components: {
+    Input,
+  },
     props: {
         display: String,
         name: String,

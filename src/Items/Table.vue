@@ -3,10 +3,10 @@
         <div v-if="items.length > 0">
             <div class="overflow-y-auto">
                 <table class="w-full">
-                    <thead>
+                    <thead class="border-t">
                         <tr class="text-left font-bold border-b">
-                            <th v-for="th in fieldsFormatted" class="px-5 py-3" :class="{'cursor-pointer hover:underline': th.sortable, 'underline': currentSort?.name === th.name }" @click="applySort(th.name)">
-                                <slot :name="`th.${th.name}`" :value="th.display" :sort="applySort">
+                            <th v-for="th in fieldsFormatted" class="px-5 py-3" :class="{'cursor-pointer hover:underline': th.sortable, 'underline': currentSort?.key === th.key }" @click="applySort(th.key)">
+                                <slot :name="`th.${th.key}`" :value="th.display" :sort="applySort">
                                     <TableHeading :value="th" :current="currentSort" />
                                 </slot>
                             </th>
@@ -21,17 +21,18 @@
                         >
                             <td
                                 v-for="field in fieldsFormatted"
-                                class="px-6 py-4 whitespace-nowrap"
+                                class="px-6 py-4 whitespace-nowrap truncate"
                                 @click="visit(item)"
-                                :data-test="`td-${field.testid}`"
+                                style="max-width: 350px"
+                                :data-test="`td-${field.key}`"
                             >
                                 <slot
                                     :index="index"
                                     :item="item"
-                                    :name="`td.${field.name}`"
-                                    :value="item[field.name]"
+                                    :name="`td.${field.key}`"
+                                    :value="item[field.key]"
                                 >
-                                    {{ data_get(item, field.path) }}
+                                    {{ data_get(item, field.key) }}
                                 </slot>
                             </td>
                             <td v-if="$slots['td-last']">
@@ -88,48 +89,71 @@ export default {
             let parameters = this.getQueryParameters();
 
             if(parameters.hasOwnProperty('sort')) {
-                this.currentSort = {name: parameters['sort'], direction: 'asc'}
+                this.currentSort = {key: parameters['sort'], direction: 'asc'}
             }
 
             if(parameters.hasOwnProperty('sort-desc')) {
-                this.currentSort = {name: parameters['sort-desc'], direction: 'desc'}
+                this.currentSort = {key: parameters['sort-desc'], direction: 'desc'}
             }
         },
         getQueryParameters() {
-            let parameters = new URLSearchParams(
-                window.location.search
-            );
+            let search = window.location.search
 
-            return Object.fromEntries(parameters.entries())
-        },
-        applySort(name) {
-            let parameters = this.getQueryParameters();
-
-            if(parameters.sort && parameters.sort === name) {
-                delete parameters['sort'];
-                parameters['sort-desc'] = name
-            } else {
-                delete parameters['sort-desc'];
-                parameters['sort'] = name
+            if (this.connect) {
+              search = localStorage.getItem(this.connect);
             }
 
-            this.$inertia.get(route(route().current()), parameters)
+            let parameters = Object.fromEntries(
+                new URLSearchParams(search).entries()
+            );
+
+            return parameters;
+        },
+        applySort(key) {
+            if(!this.sort.includes(key)) {
+              return;
+            }
+            let parameters = this.getQueryParameters();
+
+            if(parameters.sort && parameters.sort === key) {
+                delete parameters['sort'];
+                parameters['sort-desc'] = key
+              this.currentSort = {key: key, direction: 'desc'}
+            } else {
+                delete parameters['sort-desc'];
+                parameters['sort'] = key
+                this.currentSort = {key: key, direction: 'asc'}
+            }
+
+            if(this.connect) {
+              const searchParams = new URLSearchParams();
+              Object.keys(parameters).forEach(key => searchParams.append(key, parameters[key]));
+              this.get(this.url + '?' + searchParams.toString())
+            } else {
+              this.$inertia.get(route(route().current()), parameters, {
+                preserveState: true
+              })
+            }
+
         },
         formatField(field) {
+          if(typeof field === 'object') {
+            return field;
+          }
             // supports:
             // 'brand.title:Brand'
             // 'title:Brand'
             // 'brand.title'
             // 'title'
 
-            let path = field;
+            let key = field;
             let column = field;
             let display;
 
             if(field.includes(':')) {
                 column = field.split(':')[0]
                 display = field.split(':')[1]
-                path = column;
+                key = column;
             }
 
             if (column.includes('.')) {
@@ -144,11 +168,10 @@ export default {
             }
 
             return {
-                path: path,
-                name: path,
-                testid: path,
+                key: key,
+                testid: key,
                 display: str_capitalize(display),
-                sortable: this.sort && this.sort.includes(path),
+                sortable: this.sort && this.sort.includes(key),
             }
         },
         data_get(obj, key) {

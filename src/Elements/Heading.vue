@@ -3,7 +3,7 @@
         v-if="title || $slots.title || $slots.aside"
         class="flex justify-between items-center"
     >
-        <h2 class="flex-1">
+        <h2 class="flex-1 text-xl">
           <slot name="title">
               {{ title }}
           </slot>

@@ -2,19 +2,19 @@
     <div>
         <p class="py-1">{{ display }}</p>
         <div class="flex space-x-2">
-            <input
+            <Input
                 :type="type"
-                class="w-full"
                 placeholder="min"
                 :value="min"
+                v-bind="$attrs"
                 @keyup="$emit(`update:min`, $event.target.value)"
             />
 
-            <input
+            <Input
                 :type="type"
-                class="w-full"
                 placeholder="max"
                 :value="max"
+                v-bind="$attrs"
                 @keyup="$emit(`update:max`, $event.target.value)"
             />
         </div>
@@ -22,7 +22,10 @@
 </template>
 
 <script>
+import Input from "../Inputs/Input";
 export default {
+    inheritAttrs: false,
+    components: {Input},
     props: {
         display: String,
         name: String,

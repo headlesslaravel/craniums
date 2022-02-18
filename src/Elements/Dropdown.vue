@@ -1,12 +1,18 @@
 <template>
-    <div data-test="cranium-dropdown" class="z-10">
-      <Popper>
-        <button data-test="cranium-dropdown-trigger">
-            <slot name="trigger"></slot>
+    <div data-test="dropdown">
+      <Popper zIndex="10">
+        <button data-test="dropdown-trigger" class="cursor-pointer">
+            <slot name="trigger">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+            </slot>
         </button>
         <template #content>
-          <div class="bg-white rounded shadow-lg p-5" data-test="cranium-dropdown-content">
-            <slot name="content"></slot>
+          <div class="bg-white rounded shadow-lg p-5 -mt-2 border w-64" data-test="dropdown-content">
+            <slot>
+              <slot name="content"></slot>
+            </slot>
           </div>
         </template>
       </Popper>

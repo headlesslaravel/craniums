@@ -39,14 +39,14 @@
             <div :data-test="`picker-modal-${name}`">
                 <div class="flex items-center">
                     <div class="flex-1">
-                        <jet-finder :connect="`picker-${name}`"/>
+                        <Finder :connect="`picker-${name}`"/>
                     </div>
                     <div v-if="$slots['create']" class="pr-5">
                         <button @click="creating = true">New</button>
                     </div>
                 </div>
 
-                <jet-list
+                <List
                     :click="pick"
                     item-class="cursor-pointer hover:bg-gray-50 py-2 px-5 border-t"
                     @responded="setCreatingWhenEmpty"
@@ -66,8 +66,8 @@ import get from 'lodash.get'
 import JetModal from '../../Jetstream/Modal.vue';
 import JetInput from '../../Jetstream/Input.vue';
 import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
-import JetFinder from '../Elements/Finder.vue'
-import JetList from '../Items/List.vue'
+import Finder from '../Elements/Finder.vue'
+import List from '../Items/List.vue'
 import Connect from "../Mixins/Connect.js";
 import Empty from "../Items/Empty.vue";
 
@@ -78,8 +78,8 @@ export default {
         JetModal,
         JetInput,
         JetSecondaryButton,
-        JetList,
-        JetFinder, // cant have finder
+        List,
+        Finder,
     },
     props: {
         url: String,

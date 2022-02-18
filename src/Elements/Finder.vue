@@ -3,9 +3,7 @@
         <div class="flex space-x-4 p-5">
             <div class="flex-1">
                 <div class="relative rounded-md shadow-sm">
-                    <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                    >
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg
                             class="h-5 w-5 text-gray-400"
                             fill="none"
@@ -21,11 +19,12 @@
                             />
                         </svg>
                     </div>
+
                     <input
                         id="search"
                         v-query:[connect]="searchHandler"
                         autocomplete="off"
-                        class="focus:ring-gray-500 focus:border-gray-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                        class="bg-gray-50 focus:bg-white py-2 focus:ring-gray-200 focus:border-gray-200 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                         name="search"
                         data-test="cranium-finder-search"
                         placeholder="Search"
@@ -34,7 +33,7 @@
                 </div>
             </div>
 
-            <jet-select
+            <FinderSelect
                 v-if="sort"
                 v-query:[connect]="sortHandler"
                 data-test="cranium-finder-sort"
@@ -43,7 +42,7 @@
                 name="sort"
             />
 
-            <jet-select
+            <FinderSelect
                 v-if="trashed"
                 v-query:[connect]="trashHandler"
                 data-test="cranium-finder-trash"
@@ -51,71 +50,56 @@
                 empty="Trash"
             />
 
-            <span
+            <DateInterval v-if="dateInterval" />
+            <button
                 v-if="filters.length"
                 :class="{
                   'bg-gray-200 border-black border-2 font-bold': isFiltering,
                   'bg-white': !isFiltering,
                 }"
                 class=" rounded-md border border-gray-300 cursor-pointer flex space-x-2 items-center px-3 shadow"
-                data-test="cranium-finder-filter-trigger"
+                data-test="cranium-finder-filters-trigger"
                 @click="filtering = true"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" :class="{'text-black': isFiltering}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
                 <span>Filters</span>
-      </span>
+      </button>
     </div>
         <teleport to="body">
             <div
                 v-if="filters.length && filtering"
-                aria-labelledby="slide-over-title"
-                aria-modal="true"
                 class="fixed inset-0 overflow-hidden z-20"
                 role="dialog"
             >
                 <div class="absolute inset-0 overflow-hidden">
                     <div
-                        aria-hidden="true"
                         class="absolute w-full h-screen transition-opacity bg-black opacity-50 z-20"
                         @click="filtering = false"
                     ></div>
-                    <div class="z-20 fixed inset-y-0 right-0 pl-10 max-w-full flex">
+                    <div class="z-20 fixed inset-y-0 right-0 max-w-full flex">
                         <div class="relative w-screen max-w-md">
-                            <div
-                                class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll"
-                            >
+                            <div class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
                                 <div class="px-4 sm:px-6 pb-6 border-b">
-                                    <h2
-                                        id="slide-over-title"
-                                        class="text-lg font-medium text-gray-900"
-                                    >
+                                    <h2 class="text-lg font-medium text-gray-900">
                                         Filters
                                     </h2>
                                 </div>
                                 <div class="mt-6 relative flex-1 px-4 sm:px-6">
                                     <div class="absolute inset-0 px-4 sm:px-6">
-                                        <div
-                                            aria-hidden="true"
-                                            class="h-full flex justify-between flex-col"
-                                        >
+                                        <div class="h-full flex justify-between flex-col">
                                             <div data-test="cranium-finder-filters" class="flex-1 overflow-auto space-y-3">
                                                 <slot :filters="filterValues" name="filters">
-                                                    <div v-for="filter in filtersWithBindings">
-                                                        <component
-                                                            :is="filter.component"
-                                                            :display="filter.display"
-                                                            v-bind="filter.bindings"
-                                                            :name="filter.key"
-                                                        />
-<!--                                                        <component-->
-<!--                                                            :is="filter.component"-->
-<!--                                                            v-model="filterValues[filter.key]"-->
-<!--                                                            :display="filter.display"-->
-<!--                                                            :name="filter.key"-->
-<!--                                                            v-bind="filter.props"-->
-<!--                                                        />-->
+                                                    <div v-for="filter in filtersWithBindings" :data-test="`filter-${filter.key}`">
+                                                        <slot :name="`filter-${filter.key}`" :values="filterValues" :filter="filter">
+                                                            <component
+                                                                :is="filter.component"
+                                                                :display="filter.display"
+                                                                v-bind="filter.bindings"
+                                                                :name="filter.key"
+                                                            />
+                                                        </slot>
                                                     </div>
                                                 </slot>
                                             </div>
@@ -146,12 +130,12 @@
 <script>
 import debounce from 'lodash.debounce'
 import JetInput from '../../Jetstream/Input.vue';
-import JetSelect from '../Inputs/Select.vue';
+import FinderSelect from './FinderSelect.vue';
 import Connect from '../Mixins/Connect.js';
 import {Inertia} from '@inertiajs/inertia';
 import JetButton from '../../Jetstream/Button.vue';
 import JetSecondaryButton from '../../Jetstream/SecondaryButton.vue';
-
+import DateInterval from '../Inputs/DateInterval.vue';
 import FilterText from '../Filters/Text.vue';
 import FilterDate from '../Filters/Date.vue';
 import FilterRange from '../Filters/Range.vue';
@@ -162,6 +146,7 @@ export default {
     props: {
         sort: Array,
         trashed: Boolean,
+        dateInterval: Boolean,
         filters: {
             type: Array,
             default: () => [],
@@ -174,9 +159,10 @@ export default {
     mixins: [Connect],
     components: {
         JetInput,
-        JetSelect,
+        FinderSelect,
         JetButton,
         JetSecondaryButton,
+        DateInterval,
         FilterText,
         FilterDate,
         FilterRange,
@@ -192,18 +178,24 @@ export default {
     },
     data() {
         return {
-            filterValues: {},
-            filtering: false,
             searching: null,
             sorting: null,
-            trashing: null,
-            searchTimeout: null
+            filtering: false,
+            filterValues: {},
         };
     },
     methods: {
         initFilters() {
             this.filters.forEach((filter) => {
-                this.filterValues[filter.key] = null;
+                if(!filter.modifiers) {
+                  this.filterValues[filter] = null
+                } else if(filter.modifiers.length === 0) {
+                  this.filterValues[filter.key] = null;
+                } else {
+                  filter.modifiers.forEach(modifier => {
+                    this.filterValues[`${filter.key}:${modifier}`] = null;
+                  })
+                }
             })
 
             if(this.filtersFill) {
@@ -214,6 +206,7 @@ export default {
 
             let search = window.location.search;
 
+            //TODO: refactor this with Tabe.vue implementation
             if (this.connect) {
                 search = localStorage.getItem(this.connect);
             }
@@ -236,11 +229,6 @@ export default {
         },
         filterValue(key) {
             return this.filterValues[key];
-        },
-        handleFilterWithModifier(payload) {
-            Object.entries(payload).forEach(([key, value]) => {
-                this.filterValues[key] = value
-            })
         },
         searchHandler: debounce(function(payload) {
             this.applyHandler('search', 'onSearch', payload)
@@ -267,7 +255,9 @@ export default {
             } else if (this.connect) {
                 this.connectChanged('updateQuery', payload);
             } else {
-                Inertia.get(window.location.pathname, payload);
+                this.$inertia.get(window.location.pathname, payload, {
+                  preserveState: true
+                });
             }
         },
         displayFormat(item) {
@@ -325,13 +315,13 @@ export default {
         trashOptions() {
             return [
                 {
-                    name: 'with-deleted',
-                    value: 'true',
+                    name: 'trash',
+                    value: 'with',
                     display: 'With Trashed',
                 },
                 {
-                    name: 'only-deleted',
-                    value: 'true',
+                    name: 'trash',
+                    value: 'only',
                     display: 'Only Trashed',
                 },
             ];

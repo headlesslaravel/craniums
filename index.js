@@ -33,7 +33,6 @@ import QueryRange from './src/Query/Range.vue';
 import DetailText from './src/Details/Text.vue';
 // inputs
 import Picker from './src/Inputs/Picker.vue';
-import Select from './src/Inputs/Select.vue';
 import Textarea from './src/Inputs/Textarea.vue';
 import ImageInput from './src/Inputs/Image.vue';
 import FileInput from './src/Inputs/File.vue';
@@ -93,7 +92,6 @@ export {
     ImageInput,
     FileInput,
     Textarea,
-    Select,
     Picker,
     DateInterval,
     // metrics
