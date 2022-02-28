@@ -19,7 +19,7 @@ export default {
         values() {
             let key = this.$inertia.page.props.headless.resource_singular
 
-            if(route().current().endsWith('.index')) {
+            if(route().current().endsWith('.index') || route().current().includes('.slices.')) {
                 key = this.$inertia.page.props.headless.resource
             }
 
